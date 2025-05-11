@@ -1,0 +1,4 @@
+TBH Secure Agents Logo
+=====================
+This is a placeholder for the logo image.
+The actual logo should be placed in this directory as logo.png.

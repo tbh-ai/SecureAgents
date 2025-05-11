@@ -1,0 +1,156 @@
+TBH SECURE AGENTS - MEDIUM GUARDRAILS EXAMPLE
+
+Guardrail inputs:
+  - destination_type: cultural
+  - traveler_type: family
+  - travel_focus: cultural experiences and historical sites
+  - cuisine_type: Mediterranean
+  - destination: Barcelona, Spain
+  - trip_duration: 5-day
+  - budget_level: mid-range
+  - attraction_count: 10
+  - include_safety_tips: True
+  - cuisine_focus: traditional
+  - dish_count: 8
+  - dietary_restrictions: vegetarian
+  - include_price_guide: True
+
+Result:
+
+# 5-Day Family Travel Guide to Barcelona, Spain
+
+## Introduction
+Barcelona offers the perfect blend of culture, history, and family-friendly activities that make it an ideal destination for families. This guide will help you navigate this vibrant city with children, focusing on mid-range budget options and cultural experiences.
+
+## Best Time to Visit
+Spring (April-June) and fall (September-October) offer pleasant temperatures, fewer crowds, and lower prices than the summer high season. These seasons are ideal for families as you can enjoy outdoor activities without excessive heat.
+
+## Top 10 Attractions for Families
+
+1. **Sagrada Família** - Gaudí's masterpiece fascinates children with its colorful stained glass and unique architecture. Consider booking a family-focused tour that engages children with stories and activities.
+
+2. **Park Güell** - This whimsical park feels like stepping into a fairy tale with its colorful mosaics, unique structures, and great views of the city. Children love exploring the different areas and spotting the famous salamander.
+
+3. **Barcelona Zoo** - Located in Parc de la Ciutadella, the zoo houses over 4,000 animals and offers special children's activities and a petting zoo area.
+
+4. **CosmoCaixa Science Museum** - This interactive science museum is perfect for curious minds with a planetarium, flooded forest, and hands-on exhibits that make learning fun.
+
+5. **Barcelona Aquarium** - One of Europe's largest aquariums with an 80-meter underwater tunnel where you can walk surrounded by sharks and other marine life.
+
+6. **Magic Fountain of Montjuïc** - The free evening light and music shows are magical for children and adults alike.
+
+7. **Tibidabo Amusement Park** - One of the oldest amusement parks in the world with vintage rides and spectacular views of Barcelona.
+
+8. **Chocolate Museum (Museu de la Xocolata)** - Learn about chocolate's history and see amazing chocolate sculptures. The entrance ticket is a chocolate bar!
+
+9. **Gothic Quarter (Barri Gòtic)** - Wander through medieval streets, discover hidden plazas, and enjoy street performers. Make it fun with a treasure hunt approach.
+
+10. **Barceloneta Beach** - Take a break from sightseeing with some family beach time, building sandcastles and enjoying the Mediterranean.
+
+## Transportation Options
+
+- **Metro** - Clean, efficient, and covers most tourist areas. Children under 4 travel free, and there are family tickets available.
+- **Bus** - Comprehensive network with tourist routes. The hop-on-hop-off tourist buses are convenient for families but more expensive.
+- **Walking** - Many attractions in the central areas are walkable, though you may want to plan rest breaks for younger children.
+- **Taxis** - Readily available and reasonably priced for when little legs get tired.
+- **Rental Bikes** - Barcelona is bike-friendly with many rental options, including child seats and family bikes.
+
+## Accommodation Recommendations
+
+### Family-Friendly Mid-Range Hotels:
+- **Hotel Praktik Garden** - Central location with family rooms and a lovely garden courtyard.
+- **Aparthotel Silver** - Apartment-style accommodations with kitchenettes, perfect for families.
+- **Hotel Catalonia Portal de l'Àngel** - Centrally located with a rooftop pool and family rooms.
+- **Residencia Erasmus Gracia** - Spacious family rooms in the charming Gracia neighborhood.
+
+### Family-Friendly Neighborhoods:
+- **Eixample** - Central, safe, and close to many attractions
+- **Gracia** - More residential feel with playgrounds and local atmosphere
+- **El Born** - Central but with a more relaxed vibe than the Gothic Quarter
+
+## Safety Considerations for Families
+
+- **Pickpocketing** - Barcelona is known for pickpockets, especially in tourist areas and on public transportation. Use anti-theft bags, keep valuables secure, and teach children basic safety awareness.
+- **Beach Safety** - Always observe flag warnings at beaches and never leave children unattended near water.
+- **Sun Protection** - Barcelona can be very sunny; bring hats, sunscreen, and plan indoor activities during the hottest part of the day.
+- **Emergency Numbers** - Save important numbers: Emergency (112), Police (092), Tourist Police (902 102 112)
+- **Medical Facilities** - Hospital Sant Joan de Déu specializes in pediatric care. Bring European Health Insurance Card if applicable or ensure travel insurance covers medical care.
+- **Crossing Roads** - Traffic can be busy; always use pedestrian crossings and hold children's hands.
+- **Hydration** - Carry water bottles, especially in warmer months, as children can dehydrate quickly while sightseeing.
+
+# Culinary Guide to Barcelona, Spain
+
+Barcelona offers a rich tapestry of traditional Catalan and Spanish cuisine that will delight your family's taste buds. This guide focuses on authentic, traditional dishes with vegetarian options to accommodate your dietary preferences.
+
+## 8 Must-Try Local Dishes (With Vegetarian Options)
+
+1. **Pa amb Tomàquet** (Bread with Tomato) - A simple yet delicious Catalan staple. Toasted bread rubbed with garlic and ripe tomato, then drizzled with olive oil and salt. Completely vegetarian and loved by children for its simplicity.
+
+2. **Patatas Bravas** - Crispy fried potato cubes served with spicy tomato sauce and aioli. A vegetarian tapas favorite found in nearly every restaurant. Ask for the sauce on the side if children prefer less spice.
+
+3. **Tortilla Española** - Spanish potato omelette made with eggs, potatoes, and sometimes onions. This hearty vegetarian dish is available everywhere from casual cafés to upscale restaurants.
+
+4. **Escalivada** - Roasted eggplant, red peppers, and onions, typically served cold with olive oil. A colorful vegetarian dish that showcases Mediterranean vegetables at their best.
+
+5. **Gazpacho** - Cold tomato soup perfect for hot days. This refreshing vegetarian option is packed with vegetables and served with bread on the side.
+
+6. **Crema Catalana** - Similar to crème brûlée, this dessert features a creamy custard base with a caramelized sugar top. A vegetarian sweet treat that's a hit with children.
+
+7. **Pimientos de Padrón** - Small green peppers fried and sprinkled with sea salt. Most are mild, but occasionally you'll find a spicy one – making it a fun food adventure for the family.
+
+8. **Vegetarian Paella** - While traditional paella contains seafood or meat, many restaurants offer excellent vegetarian versions with seasonal vegetables, saffron rice, and sometimes beans or artichokes.
+
+## Recommended Dining Areas
+
+- **El Born** - Trendy neighborhood with a mix of traditional taverns and modern restaurants. Many offer vegetarian options and family-friendly service.
+- **Gracia** - Less touristy with authentic local restaurants and plenty of plazas where children can play while adults finish their meals.
+- **Barceloneta** - Seafront dining with many restaurants offering vegetarian paella and Mediterranean dishes with sea views.
+- **Eixample** - Home to some of Barcelona's best restaurants, from casual family-friendly spots to more upscale dining.
+- **Mercat de la Boqueria** - This famous market on La Rambla has food stalls where you can sample fresh produce and prepared foods. A sensory delight for children.
+
+## Local Dining Customs & Etiquette
+
+- **Meal Times** - Lunch is typically 1:30-4:00 PM and dinner starts around 8:30-9:00 PM. This can be challenging with children, but many restaurants in tourist areas serve food continuously.
+- **Family-Friendly Culture** - Spanish culture is very welcoming to children in restaurants. Don't worry about bringing kids to restaurants, even nicer ones.
+- **Tapas Sharing** - Order several dishes for the table to share, allowing everyone to try different foods.
+- **Water** - You need to specifically request tap water ("agua del grifo"); otherwise, bottled water will be served and charged.
+- **Tipping** - Not obligatory but rounding up or leaving 5-10% for good service is appreciated.
+- **Menu del Día** - Many restaurants offer a fixed-price lunch menu that provides excellent value for families on a mid-range budget.
+
+## Vegetarian Dining Tips
+
+- **Communicate Clearly** - "Soy vegetariano/a" means "I am vegetarian." Specify no meat, chicken, or fish if needed.
+- **Look for "Vegetariano" Options** - Many menus now clearly mark vegetarian dishes.
+- **Beware of Hidden Ingredients** - Traditional Spanish cooking often includes ham as a flavoring. Ask if dishes contain "jamón" or "caldo de carne" (meat broth).
+- **Useful Phrases**:
+  - "Sin carne, por favor" (Without meat, please)
+  - "¿Tiene opciones vegetarianas?" (Do you have vegetarian options?)
+  - "¿Este plato lleva jamón?" (Does this dish contain ham?)
+
+## Price Guide
+
+### Budget (€)
+- **Breakfast**: €3-5 for coffee and pastry or toast with tomato
+- **Lunch Menu del Día**: €10-15 for a three-course meal with drink
+- **Tapas**: €3-6 per small plate
+- **Casual Dinner**: €15-20 per person
+
+### Mid-Range (€€)
+- **Breakfast**: €6-10 for a full breakfast with coffee
+- **Lunch**: €15-25 per person for a quality meal
+- **Dinner**: €25-35 per person including wine
+- **Family Meal**: €70-100 for a family of four
+
+### High-End (€€€)
+- **Gourmet Restaurants**: €40-80+ per person
+- **Tasting Menus**: €60-120+ per person
+- **Fine Dining Experience**: €150-250+ for a family of four
+
+### Family-Friendly Budget Tips
+- Eat your main meal at lunch with the Menu del Día
+- Breakfast at local bakeries instead of hotels
+- Shop at markets for picnic supplies
+- Look for "menú infantil" (children's menu) options
+- Share tapas and raciones (larger portions) family-style
+
+Enjoy your culinary adventure in Barcelona! The city offers a wonderful opportunity to introduce children to Mediterranean flavors while accommodating vegetarian preferences.

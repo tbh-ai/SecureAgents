@@ -1,0 +1,29 @@
+TBH SECURE AGENTS - BASIC GUARDRAILS EXAMPLE
+
+Guardrail inputs:
+  - target_audience: primary care physicians
+  - topic: The impact of AI on primary care practice
+  - tone: professional
+  - word_count: 200-300 words
+  - analysis_focus: patient outcomes
+  - include_recommendations: True
+
+Result:
+
+## AI's Positive Impact on Patient Outcomes: A Data-Driven Look
+
+As primary care physicians, you're constantly seeking ways to improve patient care. Recent data highlights the positive impact of AI integration within your practices, specifically on key patient outcomes. Let's break down the numbers:
+
+*   **Patient satisfaction** has steadily increased. From 72% in 2020, it climbed to 78% in 2021 and reached 85% in 2022. This suggests AI tools are enhancing the patient experience.
+*   **Readmission rates** show a clear decline. Starting at 12.4% in 2020, they decreased to 10.8% in 2021 and further reduced to 9.2% in 2022. This points to improved care management and potentially, better preventative strategies facilitated by AI.
+*   **Average wait times** have also improved. Patients waited an average of 42 minutes in 2020, which was reduced to 38 minutes in 2021 and further lowered to 31 minutes in 2022. This increased efficiency likely contributes to improved patient satisfaction.
+
+These data trends indicate AI is making a real difference.
+
+**Recommendations:**
+
+To build on these improvements, consider these actions:
+
+1.  **Evaluate Current AI Tools:** Assess which AI solutions are producing the greatest positive impacts on your practice.
+2.  **Explore Expansion:** Look into implementing additional AI-powered tools to further improve patient outcomes and practice efficiency.
+3.  **Continuous Monitoring:** Regularly track key metrics like patient satisfaction, readmission rates, and wait times to measure AI's ongoing effectiveness.

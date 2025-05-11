@@ -1,0 +1,7 @@
+Operation,Expert,Execution Time,Result
+Test CSV format...,Test Expert,1.50s,"Language,Year,Paradigm,Creator
+Python,1991,Multi-paradigm,Guido van Rossum
+JavaScript,1995,Multi-paradigm,Brendan Eich
+Java,1995,Object-oriented,James Gosling
+C++,1985,Multi-paradigm,Bjarne Stroustrup
+Ruby,1995,Object-oriented,Yukihiro Matsumoto"

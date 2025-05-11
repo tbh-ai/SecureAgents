@@ -1,0 +1,13 @@
+TBH SECURE AGENTS - POLISHED TERMINAL EXAMPLE OUTPUT
+
+Guardrails:
+  - energy_types: ['solar', 'wind', 'hydroelectric']
+  - focus: benefits and advancements
+  - audience: general public
+  - tone: informative and engaging
+  - include_statistics: True
+  - max_length: 800 words
+
+Result:
+
+Squad execution failed: Operation 1 produced unsafe output
