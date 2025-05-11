@@ -45,6 +45,7 @@ setup(
         "google-generativeai>=0.3.0",
         "tqdm>=4.65.0",
         "reportlab>=4.0.0",
+        "nltk>=3.8.0",
     ],
     keywords="ai, agents, multi-agent, security, llm, generative-ai",
     project_urls={

@@ -3,7 +3,7 @@
 
 import logging
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 # Import logging configuration
 from .logging_config import configure_logging

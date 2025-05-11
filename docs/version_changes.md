@@ -4,6 +4,14 @@
 
 This document outlines the key changes and enhancements in the latest version of the TBH Secure Agents framework.
 
+## Version 0.3.1 (Latest)
+
+### Bug Fixes and Dependency Updates
+
+- Added nltk as an explicit dependency in setup.py
+- Fixed installation issues where nltk was required but not automatically installed
+- Improved package reliability and ease of installation
+
 ## New Guardrails System
 
 The most significant enhancement in this version is the introduction of a comprehensive guardrails system that allows for dynamic control of expert behavior at runtime.
