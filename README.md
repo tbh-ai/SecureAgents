@@ -34,7 +34,7 @@ pip install tbh-secure-agents
 
 Note that the package name uses hyphens (`tbh-secure-agents`) rather than underscores when installing with pip.
 
-This is a closed-source package with proprietary security implementations. The installation provides you with the necessary interfaces to build secure multi-agent systems without exposing the internal security mechanisms.
+This package is licensed under the Apache License 2.0 with a custom addendum. While the code is open source, it includes specialized security implementations designed to protect multi-agent systems. The package provides you with the necessary interfaces and components to build secure multi-agent systems.
 
 ## Documentation
 

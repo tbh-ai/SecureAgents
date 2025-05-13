@@ -48,8 +48,6 @@ The caching system is configured with the following parameters:
 - **Cache Expiration**: 300 seconds (5 minutes) by default
 - **Cache Size**: Unlimited (automatically managed by Python's garbage collector)
 
-You can modify these parameters in the `security_profiles.py` file if needed.
-
 ## Security Profile Optimizations
 
 ### Tiered Security Checks
