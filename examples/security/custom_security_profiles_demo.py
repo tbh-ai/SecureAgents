@@ -26,11 +26,11 @@ from tbh_secure_agents.security_profiles import (
 )
 
 # Get API key from environment variable or use a default one for testing
-API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyDYGDWiED84ZAL71xbT3QDBfUnCTrIPvpc")
+API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
 def register_industry_profiles():
     """Register custom security profiles for different industries."""
-    
+
     # Register a healthcare security profile
     healthcare_profile = register_custom_profile(
         name="healthcare",
@@ -52,7 +52,7 @@ def register_industry_profiles():
         },
         description="Custom security profile for healthcare applications with strict PII protection"
     )
-    
+
     # Register a finance security profile
     finance_profile = register_custom_profile(
         name="finance",
@@ -74,7 +74,7 @@ def register_industry_profiles():
         },
         description="Custom security profile for financial applications with strict data protection"
     )
-    
+
     # Register an education security profile
     education_profile = register_custom_profile(
         name="education",
@@ -96,7 +96,7 @@ def register_industry_profiles():
         },
         description="Custom security profile for educational applications with balanced security"
     )
-    
+
     # Register a creative security profile
     creative_profile = register_custom_profile(
         name="creative",
@@ -118,7 +118,7 @@ def register_industry_profiles():
         },
         description="Custom security profile for creative applications with minimal restrictions"
     )
-    
+
     return [healthcare_profile, finance_profile, education_profile, creative_profile]
 
 def create_expert_with_profile(profile_name):
@@ -159,7 +159,7 @@ def test_custom_profile(profile_name):
     print(f"\n{'=' * 80}")
     print(f"Testing {profile_name.upper()} Custom Security Profile")
     print(f"{'=' * 80}")
-    
+
     # Get profile details
     profile = get_custom_profile(profile_name)
     if profile:
@@ -169,18 +169,18 @@ def test_custom_profile(profile_name):
     else:
         print(f"Profile '{profile_name}' not found")
         return False
-    
+
     # Create an expert with the specified profile
     expert = create_expert_with_profile(profile_name)
     print(f"Created expert with {profile_name} security profile")
-    
+
     # Create an operation appropriate for the profile
     operation = create_operation_for_profile(profile_name)
     print(f"Created operation: '{operation.instructions}'")
-    
+
     # Assign the expert to the operation
     operation.expert = expert
-    
+
     # Create a squad with the same security level
     squad = Squad(
         experts=[expert],
@@ -189,7 +189,7 @@ def test_custom_profile(profile_name):
         security_level=profile_name
     )
     print(f"Created squad with {profile_name} security level")
-    
+
     # Deploy the squad
     print("\nDeploying squad...")
     try:
@@ -208,35 +208,35 @@ def main():
     """Run the custom security profiles demo."""
     print("TBH Secure Agents - Custom Security Profiles Demo")
     print("=" * 50)
-    
+
     # Register industry profiles
     print("Registering custom security profiles...")
     profiles = register_industry_profiles()
-    
+
     # List registered profiles
     registered_profiles = list_custom_profiles()
     print(f"Registered profiles: {registered_profiles}")
-    
+
     # Test each custom profile
     results = {}
     for profile_name in registered_profiles:
         results[profile_name] = test_custom_profile(profile_name)
-    
+
     # Print summary
     print("\n" + "=" * 50)
     print("Custom Security Profiles Demo Summary")
     print("=" * 50)
-    
+
     for profile_name, success in results.items():
         status = "✅ PASSED" if success else "❌ FAILED"
         print(f"- {profile_name.upper()}: {status}")
-    
+
     print("\nConclusion:")
     if all(results.values()):
         print("✅ All custom security profiles work as expected")
     else:
         print("❌ Some custom security profiles failed")
-    
+
     # Clear caches
     clear_caches()
     print("\nCaches cleared")

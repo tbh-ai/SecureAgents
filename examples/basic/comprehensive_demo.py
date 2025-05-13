@@ -39,7 +39,7 @@ from tbh_secure_agents.security_profiles import (
 )
 
 # Get API key from environment variable or use a default one for testing
-API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyDYGDWiED84ZAL71xbT3QDBfUnCTrIPvpc")
+API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
 # Sample data for demonstration
 SAMPLE_DATA = """

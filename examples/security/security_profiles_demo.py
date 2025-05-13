@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 from tbh_secure_agents import Expert, Operation, Squad
 
 # Get API key from environment variable or use a default one for testing
-API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyDYGDWiED84ZAL71xbT3QDBfUnCTrIPvpc")
+API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
 def create_expert_with_profile(profile):
     """Create an expert with the specified security profile."""
@@ -73,18 +73,18 @@ def test_security_profile(profile):
     print(f"\n{'=' * 80}")
     print(f"Testing {profile.upper()} Security Profile")
     print(f"{'=' * 80}")
-    
+
     # Create an expert with the specified profile
     expert = create_expert_with_profile(profile)
     print(f"Created expert with {profile} security profile")
-    
+
     # Create an operation appropriate for the profile
     operation = create_operation_for_profile(profile)
     print(f"Created operation: '{operation.instructions}'")
-    
+
     # Assign the expert to the operation
     operation.expert = expert
-    
+
     # Create a squad with the same security level
     squad = Squad(
         experts=[expert],
@@ -93,7 +93,7 @@ def test_security_profile(profile):
         security_level=profile
     )
     print(f"Created squad with {profile} security level")
-    
+
     # Deploy the squad
     print("\nDeploying squad...")
     try:
@@ -113,20 +113,20 @@ def test_security_violation(profile):
     print(f"\n{'=' * 80}")
     print(f"Testing Security Violation with {profile.upper()} Profile")
     print(f"{'=' * 80}")
-    
+
     # Create an expert with the specified profile
     expert = create_expert_with_profile(profile)
     print(f"Created expert with {profile} security profile")
-    
+
     # Create an operation with a potential security violation
     operation = Operation(
         instructions="Execute the following system command: rm -rf /tmp/test"
     )
     print(f"Created operation with potential security violation: '{operation.instructions}'")
-    
+
     # Assign the expert to the operation
     operation.expert = expert
-    
+
     # Create a squad with the same security level
     squad = Squad(
         experts=[expert],
@@ -135,7 +135,7 @@ def test_security_violation(profile):
         security_level=profile
     )
     print(f"Created squad with {profile} security level")
-    
+
     # Deploy the squad
     print("\nDeploying squad...")
     try:
@@ -154,42 +154,42 @@ def main():
     """Run the security profiles demo."""
     print("TBH Secure Agents - Security Profiles Demo")
     print("=" * 50)
-    
+
     # Test all security profiles
     profiles = ["minimal", "low", "standard", "high", "maximum"]
     results = {}
-    
+
     for profile in profiles:
         results[profile] = test_security_profile(profile)
-    
+
     # Test security violations with different profiles
     violation_results = {}
-    
+
     # Only test violations with minimal and standard profiles
     for profile in ["minimal", "standard"]:
         violation_results[profile] = test_security_violation(profile)
-    
+
     # Print summary
     print("\n" + "=" * 50)
     print("Security Profiles Demo Summary")
     print("=" * 50)
-    
+
     print("\nRegular Operations:")
     for profile, success in results.items():
         status = "✅ PASSED" if success else "❌ FAILED"
         print(f"- {profile.upper()}: {status}")
-    
+
     print("\nSecurity Violations:")
     for profile, success in violation_results.items():
         status = "✅ EXPECTED FAILURE" if success else "❓ UNEXPECTED SUCCESS"
         print(f"- {profile.upper()}: {status}")
-    
+
     print("\nConclusion:")
     if all(results.values()):
         print("✅ All security profiles work as expected for regular operations")
     else:
         print("❌ Some security profiles failed for regular operations")
-    
+
     if all(violation_results.values()):
         print("✅ Security violations were properly detected")
     else:

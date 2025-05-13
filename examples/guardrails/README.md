@@ -28,7 +28,7 @@ The examples are organized by complexity level:
 To run any of these examples, make sure you have set your Google API key as an environment variable:
 
 ```bash
-export GOOGLE_API_KEY=your_api_key_here
+export GOOGLE_API_KEY=your_api_key_here  # Replace with your actual API key
 ```
 
 Then run the example:

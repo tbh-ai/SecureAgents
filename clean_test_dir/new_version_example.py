@@ -51,7 +51,7 @@ def main():
     print("="*80 + "\n")
 
     # Get API key from environment variable or use a default for testing
-    api_key = os.environ.get("GOOGLE_API_KEY", "")
+    api_key = os.environ.get("GOOGLE_API_KEY", "AIzaSyA3ZxbIXpR3yNkZwGDznrztdQmgnU16DJI")
 
     # Using the provided API key
     print(f"Using API key: {api_key[:5]}...{api_key[-4:]}")

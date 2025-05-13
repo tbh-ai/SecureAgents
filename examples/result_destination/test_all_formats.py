@@ -27,7 +27,7 @@ OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # Get API key from environment variable or use a default one for testing
-API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyDYGDWiED84ZAL71xbT3QDBfUnCTrIPvpc")
+API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
 def create_expert():
     """Create a test expert."""
@@ -161,20 +161,20 @@ Social,Sustainable Development,Meets present needs without compromising future g
 def test_format(format_type):
     """Test a specific file format."""
     print(f"\nTesting {format_type.upper()} format...")
-    
+
     # Create an expert
     expert = create_expert()
-    
+
     # Create the file path
     file_path = os.path.join(OUTPUT_DIR, f"result.{format_type}")
-    
+
     # Create an operation with the specific result_destination
     operation = Operation(
         instructions=f"Create content about renewable energy benefits in {format_type.upper()} format",
         expert=expert,
         result_destination=file_path
     )
-    
+
     # Create a squad with just this operation
     squad = Squad(
         experts=[expert],
@@ -182,20 +182,20 @@ def test_format(format_type):
         process="sequential",
         security_level="minimal"  # Use minimal security for testing
     )
-    
+
     # Mock the execution by directly setting the result
     # In a real scenario, this would be done by the LLM
     operation.result = simulate_operation_result(format_type)
-    
+
     # Manually trigger the result saving
     success = operation._save_result_to_file(operation.result)
-    
+
     # Check if the file was created
     if os.path.exists(file_path):
         file_size = os.path.getsize(file_path)
         print(f"✓ Success! File created: {file_path}")
         print(f"  File size: {file_size} bytes")
-        
+
         # Print a preview of the file content
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -203,17 +203,17 @@ def test_format(format_type):
             print(f"  Preview: {preview}")
     else:
         print(f"✗ Failed to create file: {file_path}")
-    
+
     return file_path
 
 def main():
     """Run tests for all supported formats."""
     print("Testing all supported result_destination file formats")
     print("=" * 50)
-    
+
     # List of formats to test
     formats = ['txt', 'md', 'csv', 'json', 'html', 'pdf']
-    
+
     # Test each format
     created_files = []
     for format_type in formats:
@@ -222,13 +222,13 @@ def main():
             created_files.append(file_path)
         except Exception as e:
             print(f"Error testing {format_type} format: {e}")
-    
+
     # Print summary
     print("\nTest Summary")
     print("=" * 50)
     print(f"Tested {len(formats)} formats")
     print(f"Successfully created {len(created_files)} files")
-    
+
     # List all created files
     print("\nCreated files:")
     for file_path in created_files:
