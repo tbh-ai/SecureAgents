@@ -24,7 +24,7 @@ from tbh_secure_agents import Expert, Operation, Squad
 os.makedirs("output", exist_ok=True)
 
 # Set API key (replace with your actual API key or set as environment variable)
-API_KEY = os.environ.get("GOOGLE_API_KEY", "AIzaSyAwkWbBba6t9O15Ok0bsxFmBRoFfhokmVA")  # Using a demo API key
+API_KEY = os.environ.get("GOOGLE_API_KEY", "")  # Using a demo API key
 
 # Create specialized experts with minimal security profiles
 market_researcher = Expert(
