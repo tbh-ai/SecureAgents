@@ -30,7 +30,19 @@ logger = logging.getLogger(__name__)
 # Define custom exceptions
 class SecurityError(Exception):
     """Exception raised for security-related issues in the Squad."""
-    pass
+
+    def __init__(self, message, error_code=None, suggestions=None):
+        """
+        Initialize the SecurityError with a message, error code, and suggestions.
+
+        Args:
+            message (str): The error message
+            error_code (str, optional): A code identifying the type of security error
+            suggestions (List[str], optional): A list of suggestions to resolve the issue
+        """
+        self.error_code = error_code
+        self.suggestions = suggestions or []
+        super().__init__(message)
 
 class Squad:
     """
@@ -43,12 +55,27 @@ class Squad:
         # Add attributes like memory, security_manager, etc.
     """
     def __init__(self, experts: List[Expert], operations: List[Operation], process: str = 'sequential',
-                 security_level: str = 'standard', trust_verification: bool = False,
+                 security_profile: str = 'standard', trust_verification: bool = False,
                  result_destination: Optional[Dict[str, str]] = None, **kwargs):
+        """
+        Initialize a Squad with experts, operations, and security settings.
+
+        Args:
+            experts (List[Expert]): A list of Expert objects part of this squad
+            operations (List[Operation]): A list of Operation objects to be executed by the squad
+            process (str): The execution process ('sequential', 'hierarchical', 'parallel')
+            security_profile (str): The security profile to use ('minimal', 'low', 'standard', 'high', 'maximum')
+            trust_verification (bool): Whether to verify trust between experts
+            result_destination (Optional[Dict[str, str]]): Configuration for result output
+            **kwargs: Additional configuration options
+        """
         self.experts = experts
         self.operations = operations
         self.process = process # Example: 'sequential', 'hierarchical'
-        self.security_level_str = security_level  # Store original string value
+        self.security_level_str = security_profile  # Store original string value
+
+        # For backward compatibility
+        security_level = kwargs.get('security_level', security_profile)
         self.trust_verification = trust_verification  # Whether to verify trust between experts
         self.result_destination = result_destination  # Where to save the final result
 
@@ -169,11 +196,41 @@ class Squad:
 
         # Security check: Validate squad configuration before execution
         terminal.start_spinner("Validating squad security configuration")
-        if not self._validate_squad_security():
-            logger.error("⚠️ SECURITY WARNING: Squad deployment aborted: Security validation failed")
+        is_valid, error_details = self._validate_squad_security()
+
+        if not is_valid:
+            # Log the error with details if available
+            if error_details and 'error_message' in error_details:
+                logger.error(f"⚠️ SECURITY WARNING: Squad deployment aborted: Security validation failed - {error_details['error_message']}")
+            else:
+                logger.error("⚠️ SECURITY WARNING: Squad deployment aborted: Security validation failed")
+
             terminal.stop_spinner(False, "Squad security validation failed")
-            terminal.print_error("Squad deployment aborted: Security validation failed")
+
+            # Display helpful error message with suggestions if available
+            if error_details and 'suggestions' in error_details and error_details['suggestions']:
+                error_message = "Squad deployment aborted: Security validation failed"
+                if 'error_message' in error_details:
+                    error_message += f": {error_details['error_message']}"
+
+                # Use the enhanced terminal UI to display error with suggestions and details
+                details = None
+                if 'details' in error_details:
+                    details = error_details['details']
+                elif 'error_code' in error_details:
+                    details = f"Error code: {error_details['error_code']}"
+
+                # Use security warning for security-related errors
+                terminal.print_security_warning(
+                    message=error_message,
+                    suggestions=error_details['suggestions'],
+                    details=details
+                )
+            else:
+                terminal.print_error("Squad deployment aborted: Security validation failed")
+
             return "Error: Squad security validation failed. Deployment aborted."
+
         terminal.stop_spinner(True, "Squad security validation passed")
 
         # Initialize execution tracking
@@ -219,16 +276,48 @@ class Squad:
             # Security check: Validate operation before assignment
             terminal.start_spinner(f"Validating operation {i+1}/{len(self.operations)}")
             logger.debug(f"Validating operation {i+1}/{len(self.operations)}: '{operation.instructions[:30]}...'")
-            if not self._validate_operation_security(operation, i):
-                logger.error(f"⚠️ SECURITY WARNING: Operation validation failed for operation {i+1}: '{operation.instructions[:30]}...'")
+
+            # Get validation result with error details if any
+            is_valid, error_details = self._validate_operation_security(operation, i)
+
+            if not is_valid:
+                # Log the error with details if available
+                if error_details and 'error_message' in error_details:
+                    logger.error(f"⚠️ SECURITY WARNING: Operation validation failed for operation {i+1}: '{operation.instructions[:30]}...' - {error_details['error_message']}")
+                else:
+                    logger.error(f"⚠️ SECURITY WARNING: Operation validation failed for operation {i+1}: '{operation.instructions[:30]}...'")
+
                 terminal.stop_spinner(False, f"Operation {i+1} validation failed")
                 operation_record['status'] = 'validation_failed'
                 self.execution_metrics['operations_failed'] += 1
-                if self.process == 'sequential':
+
+                # Display helpful error message with suggestions if available
+                if error_details and 'suggestions' in error_details and error_details['suggestions']:
+                    error_message = f"Security validation failed for operation {i+1}"
+                    if 'error_message' in error_details:
+                        error_message += f": {error_details['error_message']}"
+
+                    # Use the enhanced terminal UI to display error with suggestions and details
+                    details = None
+                    if 'details' in error_details:
+                        details = error_details['details']
+                    elif 'error_code' in error_details:
+                        details = f"Error code: {error_details['error_code']}"
+
+                    # Use security warning for security-related errors
+                    terminal.print_security_warning(
+                        message=error_message,
+                        suggestions=error_details['suggestions'],
+                        details=details
+                    )
+                else:
                     terminal.print_error(f"Squad execution failed: Security validation failed for operation {i+1}")
+
+                if self.process == 'sequential':
                     return f"Squad execution failed: Security validation failed for operation {i+1}"
                 else:
                     continue  # Skip this operation but continue with others for non-sequential processes
+
             terminal.stop_spinner(True, f"Operation {i+1} validation passed")
 
             # Assign expert if not already assigned
@@ -380,25 +469,39 @@ class Squad:
 
         return final_output
 
-    def _validate_squad_security(self) -> bool:
+    def _validate_squad_security(self) -> Tuple[bool, Optional[Dict[str, Any]]]:
         """
         Validates the security of the squad configuration before execution.
         Checks for potential security issues in the squad setup.
         Security checks are applied based on the squad's security profile.
 
         Returns:
-            bool: True if the squad passes all security checks, False otherwise
+            Tuple[bool, Optional[Dict[str, Any]]]:
+                - Boolean indicating if the squad passes all security checks
+                - Dictionary with error details and suggestions if validation fails, None otherwise
         """
         logger.debug(f"Validating squad security with profile {self.security_profile.value}...")
+
+        # Initialize error details
+        error_details = None
 
         # Skip most checks for minimal security profile
         if self.security_profile == SecurityProfile.MINIMAL:
             logger.info("Using MINIMAL security profile - performing only basic squad validation")
             # Only check if there are any experts and operations
             if not self.experts or not self.operations:
-                logger.error("⚠️ SECURITY WARNING: Squad security validation failed: No experts or operations in squad")
-                return False
-            return True
+                error_details = {
+                    "error_code": "missing_components",
+                    "error_message": "No experts or operations in squad",
+                    "suggestions": [
+                        "Add at least one expert to the squad",
+                        "Add at least one operation to the squad",
+                        "Check if experts and operations were properly initialized"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+                return False, error_details
+            return True, None
 
         # For low security profile, only perform basic checks
         if self.security_profile == SecurityProfile.LOW:
@@ -406,31 +509,78 @@ class Squad:
 
             # 1. Check if there are any experts and operations
             if not self.experts:
-                logger.error("⚠️ SECURITY WARNING: Squad security validation failed: No experts in squad")
-                return False
+                error_details = {
+                    "error_code": "no_experts",
+                    "error_message": "No experts in squad",
+                    "suggestions": [
+                        "Add at least one expert to the squad",
+                        "Check if experts were properly initialized",
+                        "Use the Expert class to create experts with appropriate specialties"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+                return False, error_details
 
             if not self.operations:
-                logger.error("⚠️ SECURITY WARNING: Squad security validation failed: No operations in squad")
-                return False
+                error_details = {
+                    "error_code": "no_operations",
+                    "error_message": "No operations in squad",
+                    "suggestions": [
+                        "Add at least one operation to the squad",
+                        "Check if operations were properly initialized",
+                        "Use the Operation class to create operations with clear instructions"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+                return False, error_details
 
             # 2. Check for proper process type
             valid_processes = ['sequential', 'hierarchical', 'parallel']
             if self.process not in valid_processes:
-                logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: Invalid process type '{self.process}'")
-                return False
+                error_details = {
+                    "error_code": "invalid_process",
+                    "error_message": f"Invalid process type '{self.process}'",
+                    "suggestions": [
+                        f"Use one of the valid process types: {', '.join(valid_processes)}",
+                        "The 'sequential' process is recommended for most use cases",
+                        "Check for typos in the process name"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+                return False, error_details
 
-            return True
+            return True, None
 
         # For standard and higher security profiles, perform comprehensive checks
 
         # 1. Check if there are any experts and operations
         if not self.experts:
-            logger.error("⚠️ SECURITY WARNING: Squad security validation failed: No experts in squad")
-            return False
+            error_details = {
+                "error_code": "no_experts",
+                "error_message": "No experts in squad",
+                "suggestions": [
+                    "Add at least one expert to the squad",
+                    "Check if experts were properly initialized",
+                    "Use the Expert class to create experts with appropriate specialties",
+                    "Consider using experts with specialties relevant to your operations"
+                ]
+            }
+            logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+            return False, error_details
 
         if not self.operations:
-            logger.error("⚠️ SECURITY WARNING: Squad security validation failed: No operations in squad")
-            return False
+            error_details = {
+                "error_code": "no_operations",
+                "error_message": "No operations in squad",
+                "suggestions": [
+                    "Add at least one operation to the squad",
+                    "Check if operations were properly initialized",
+                    "Use the Operation class to create operations with clear instructions",
+                    "Consider breaking down complex tasks into multiple operations"
+                ]
+            }
+            logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+            return False, error_details
 
         # 2. Check for expert security profiles
         security_profiles = [getattr(expert, 'security_profile', None) for expert in self.experts]
@@ -448,8 +598,18 @@ class Squad:
         # 4. Check for expert-operation compatibility
         for operation in self.operations:
             if operation.expert and not hasattr(operation.expert, 'execute_task'):
-                logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: Expert assigned to operation '{operation.instructions[:30]}...' lacks execute_task method")
-                return False
+                error_details = {
+                    "error_code": "incompatible_expert",
+                    "error_message": f"Expert assigned to operation '{operation.instructions[:30]}...' lacks execute_task method",
+                    "suggestions": [
+                        "Ensure all experts are properly initialized with the Expert class",
+                        "Check if the expert object has been modified after creation",
+                        "Use only properly initialized Expert objects in your squad",
+                        "Reassign the operation to a different, properly initialized expert"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+                return False, error_details
 
         # 5. Check for duplicate operations (potential redundancy attack)
         operation_instructions = [operation.instructions for operation in self.operations]
@@ -475,14 +635,35 @@ class Squad:
             max_instruction_length = int(20000 + (100000 - 20000) * sensitivity_threshold)
 
         if total_instruction_length > max_instruction_length:
-            logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: Total operation instructions too long ({total_instruction_length} chars, limit {max_instruction_length})")
-            return False
+            profile_name = self.security_profile.value
+            error_details = {
+                "error_code": "excessive_instructions",
+                "error_message": f"Total operation instructions too long ({total_instruction_length} characters, limit {max_instruction_length} for {profile_name} security profile)",
+                "suggestions": [
+                    "Break down operations into smaller, more focused tasks",
+                    "Remove unnecessary details from operation instructions",
+                    f"Consider using a lower security profile if you need to process large instructions (current: {profile_name})",
+                    "Focus on the core tasks and remove supplementary information"
+                ]
+            }
+            logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+            return False, error_details
 
         # 7. Check for proper process type
         valid_processes = ['sequential', 'hierarchical', 'parallel']
         if self.process not in valid_processes:
-            logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: Invalid process type '{self.process}'")
-            return False
+            error_details = {
+                "error_code": "invalid_process",
+                "error_message": f"Invalid process type '{self.process}'",
+                "suggestions": [
+                    f"Use one of the valid process types: {', '.join(valid_processes)}",
+                    "The 'sequential' process is recommended for most use cases",
+                    "Check for typos in the process name",
+                    "If you need a custom process type, consider extending the framework"
+                ]
+            }
+            logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+            return False, error_details
 
         # 8. For HIGH, MAXIMUM, and CUSTOM security profiles, perform additional checks
         if self.security_profile in [SecurityProfile.HIGH, SecurityProfile.MAXIMUM, SecurityProfile.CUSTOM]:
@@ -496,12 +677,22 @@ class Squad:
                     self.security_thresholds.get("reliability_score", 0.5) < 0.3  # Strict custom profile
                 ):
                     profile_name = self.custom_profile_name if self.security_profile == SecurityProfile.CUSTOM else self.security_profile.value
-                    logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: Security profile mismatch in {profile_name} security mode")
-                    return False
+                    error_details = {
+                        "error_code": "security_profile_mismatch",
+                        "error_message": f"Security profile mismatch in {profile_name} security mode",
+                        "suggestions": [
+                            f"Ensure all experts use the same security profile ({profile_name})",
+                            "Update experts with mismatched security profiles",
+                            "If different security profiles are necessary, use a lower squad security profile",
+                            "For maximum security, all components must use consistent security settings"
+                        ]
+                    }
+                    logger.error(f"⚠️ SECURITY WARNING: Squad security validation failed: {error_details['error_message']}")
+                    return False, error_details
 
         # All checks passed
         logger.debug("Squad security validation passed")
-        return True
+        return True, None
 
     def _audit_squad_results(self, final_output: Optional[str]) -> bool:
         """
@@ -575,7 +766,7 @@ class Squad:
         return True
 
     @cache_security_validation
-    def _validate_operation_security(self, operation: Operation, index: int) -> bool:
+    def _validate_operation_security(self, operation: Operation, index: int) -> Tuple[bool, Optional[Dict[str, Any]]]:
         """
         Enhanced security validation of an operation before execution.
         Implements more sophisticated detection for dangerous operations and other security issues.
@@ -587,20 +778,33 @@ class Squad:
             index (int): The index of the operation in the task list (used for logging)
 
         Returns:
-            bool: True if the operation passes all security checks, False otherwise
+            Tuple[bool, Optional[Dict[str, Any]]]:
+                - Boolean indicating if the operation passes all security checks
+                - Dictionary with error details and suggestions if validation fails, None otherwise
         """
         # Use index in logging for better traceability
         logger.debug(f"Validating operation at index {index} with security profile {self.security_profile.value}")
+
+        # Initialize error details
+        error_details = None
 
         # Skip most checks for minimal security profile
         if self.security_profile == SecurityProfile.MINIMAL:
             logger.info(f"Using MINIMAL security profile - performing only basic operation validation for operation {index+1}")
             # Only check if operation has valid instructions
             if not operation.instructions or len(operation.instructions.strip()) < 5:
-                logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Instructions too short or empty")
+                error_details = {
+                    "error_code": "invalid_instructions",
+                    "error_message": "Instructions too short or empty",
+                    "suggestions": [
+                        "Provide more detailed instructions (at least 5 characters)",
+                        "Check if the operation instructions were properly initialized"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}")
                 self._record_security_incident("invalid_instructions", operation, "too_short_or_empty")
-                return False
-            return True
+                return False, error_details
+            return True, None
 
         # For low security profile, only perform basic checks
         if self.security_profile == SecurityProfile.LOW:
@@ -608,15 +812,32 @@ class Squad:
 
             # 1. Check if operation has valid instructions
             if not operation.instructions or len(operation.instructions.strip()) < 10:
-                logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Instructions too short or empty")
+                error_details = {
+                    "error_code": "invalid_instructions",
+                    "error_message": "Instructions too short or empty",
+                    "suggestions": [
+                        "Provide more detailed instructions (at least 10 characters)",
+                        "Check if the operation instructions were properly initialized"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}")
                 self._record_security_incident("invalid_instructions", operation, "too_short_or_empty")
-                return False
+                return False, error_details
 
             # 2. Check for excessive instruction length
             if len(operation.instructions) > 20000:  # More permissive limit for LOW security
-                logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Instructions too long ({len(operation.instructions)} chars)")
+                error_details = {
+                    "error_code": "excessive_instructions",
+                    "error_message": f"Instructions too long ({len(operation.instructions)} characters, limit 20000)",
+                    "suggestions": [
+                        "Break down the operation into smaller, more focused operations",
+                        "Remove unnecessary details from the instructions",
+                        "Consider using a higher security profile if you need to process large instructions"
+                    ]
+                }
+                logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}")
                 self._record_security_incident("excessive_instructions", operation, f"length={len(operation.instructions)}")
-                return False
+                return False, error_details
 
             # 3. Check for critical system commands only
             critical_patterns = [
@@ -627,19 +848,47 @@ class Squad:
 
             for pattern in critical_patterns:
                 if get_cached_regex(pattern).search(operation.instructions):
-                    logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Critical system command detected matching pattern: '{pattern}'")
-                    self._record_security_incident("critical_command", operation, pattern)
-                    return False
+                    # Map regex patterns to user-friendly descriptions
+                    pattern_descriptions = {
+                        r'\b(?:rm\s+-rf\s+/|format\s+[a-z]:|\bdd\s+if)': "system file deletion commands (like 'rm -rf /')",
+                        r'\b(?:wipe|erase)\s+(?:disk|drive|all)': "disk wiping commands",
+                        r'\b(?:drop\s+database|truncate\s+all)': "database deletion commands"
+                    }
 
-            return True
+                    # Get a user-friendly description or use a generic one if pattern not found
+                    description = pattern_descriptions.get(pattern, "potentially dangerous system commands")
+
+                    error_details = {
+                        "error_code": "critical_command",
+                        "error_message": f"Critical system command detected",
+                        "suggestions": [
+                            f"Remove or replace the {description} in your instructions",
+                            "Use safer alternatives to perform the intended operation",
+                            "If this is a legitimate use case, consider using a custom security profile"
+                        ]
+                    }
+                    logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']} - detected {description}")
+                    self._record_security_incident("critical_command", operation, pattern)
+                    return False, error_details
+
+            return True, None
 
         # For standard and higher security profiles, perform comprehensive checks
 
         # 1. Check if operation has valid instructions
         if not operation.instructions or len(operation.instructions.strip()) < 10:
-            logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Instructions too short or empty")
+            error_details = {
+                "error_code": "invalid_instructions",
+                "error_message": "Instructions too short or empty",
+                "suggestions": [
+                    "Provide more detailed instructions (at least 10 characters)",
+                    "Check if the operation instructions were properly initialized",
+                    "Consider what specific task you want the expert to perform"
+                ]
+            }
+            logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}")
             self._record_security_incident("invalid_instructions", operation, "too_short_or_empty")
-            return False
+            return False, error_details
 
         # 2. Check for excessive instruction length
         max_length = 10000  # Default for STANDARD
@@ -649,9 +898,20 @@ class Squad:
             max_length = 2000
 
         if len(operation.instructions) > max_length:
-            logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Instructions too long ({len(operation.instructions)} chars, limit {max_length})")
+            profile_name = self.security_profile.value
+            error_details = {
+                "error_code": "excessive_instructions",
+                "error_message": f"Instructions too long ({len(operation.instructions)} characters, limit {max_length} for {profile_name} security profile)",
+                "suggestions": [
+                    "Break down the operation into smaller, more focused operations",
+                    "Remove unnecessary details from the instructions",
+                    f"Consider using a lower security profile if you need to process large instructions (current: {profile_name})",
+                    "Focus on the core task and remove supplementary information"
+                ]
+            }
+            logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}")
             self._record_security_incident("excessive_instructions", operation, f"length={len(operation.instructions)}")
-            return False
+            return False, error_details
 
         # 3. Enhanced check for potentially dangerous operations based on keywords
         if self.security_checks.get("critical_exploits", True):
@@ -678,11 +938,67 @@ class Squad:
                 r'\b(?:require\(|import\s+|from\s+\w+\s+import)',
             ]
 
+            # Create a mapping of patterns to user-friendly descriptions
+            pattern_descriptions = {
+                # System commands
+                r'\b(?:system|exec|eval|subprocess)\s*\(': "system command execution functions",
+                r'\b(?:os\.|subprocess\.|shell\.|bash\.|powershell\.|cmd\.|terminal\.|console\.)': "system/shell command interfaces",
+
+                # File system operations
+                r'\b(?:rm\s+-rf|rmdir\s+/|format\s+[a-z]:)': "file deletion or formatting commands",
+                r'\b(?:delete|remove)\s+(?:all|every|database|file|directory|folder)': "mass deletion commands",
+                r'\b(?:wipe|erase)\s+(?:disk|drive|data|database|file|directory|folder)': "data wiping commands",
+
+                # Database operations
+                r'\b(?:drop\s+table|drop\s+database|truncate\s+table)': "database deletion commands",
+                r'\b(?:delete\s+from\s+\w+\s+where|update\s+\w+\s+set)': "database modification commands",
+
+                # Network operations
+                r'\b(?:socket\.|connect\(|bind\(|listen\(|accept\()': "low-level network operations",
+                r'\b(?:wget\s+|curl\s+|fetch\s+|download\s+)(?:http|https|ftp)': "external file download commands",
+
+                # Code execution
+                r'\b(?:eval\(|setTimeout\(|setInterval\(|Function\()': "dynamic code execution functions",
+                r'\b(?:require\(|import\s+|from\s+\w+\s+import)': "code import statements"
+            }
+
             for pattern in dangerous_patterns:
                 if get_cached_regex(pattern).search(operation.instructions):
-                    logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Potentially dangerous operation detected matching pattern: '{pattern}'")
+                    # Determine the category of the dangerous pattern
+                    category = "system command"
+                    if "rm " in pattern or "delete" in pattern or "wipe" in pattern:
+                        category = "file system operation"
+                    elif "drop" in pattern or "truncate" in pattern:
+                        category = "database operation"
+                    elif "socket" in pattern or "wget" in pattern or "curl" in pattern:
+                        category = "network operation"
+                    elif "eval" in pattern or "require" in pattern or "import" in pattern:
+                        category = "code execution"
+
+                    # Get a user-friendly description or use a generic one if pattern not found
+                    description = pattern_descriptions.get(pattern, f"potentially dangerous {category}")
+
+                    error_details = {
+                        "error_code": "dangerous_operation",
+                        "error_message": f"Potentially dangerous {category} detected",
+                        "suggestions": [
+                            f"Remove or replace the {description} in your instructions",
+                            "Use safer alternatives to perform the intended operation",
+                            "If this is a legitimate use case, consider using a custom security profile",
+                            "Rephrase your instructions to avoid terms that might be interpreted as system commands"
+                        ]
+                    }
+                    # Log the error with details
+                    logger.error(
+                        f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}",
+                        extra={
+                            'suggestions': error_details['suggestions'],
+                            'details': f"Detected {description} in your instructions"
+                        }
+                    )
+
                     self._record_security_incident("dangerous_operation", operation, pattern)
-                    return False
+                    return False, error_details
 
         # 4. Enhanced check for operations that might lead to data exfiltration
         if self.security_checks.get("content_analysis", True):
@@ -693,11 +1009,47 @@ class Squad:
                 r'\b(?:api|endpoint|webhook|callback)\s+(?:send|post|put)\s+(?:data|information|content)',
             ]
 
+            # Create a mapping of patterns to user-friendly descriptions
+            exfiltration_descriptions = {
+                r'\b(?:send|transmit|upload|post|export)\s+(?:data|file|information|content|document)\s+(?:to|on|at)\s+(?:http|https|ftp|external|remote)':
+                    "instructions to send data to external websites or servers",
+
+                r'\b(?:email|mail|message|dm|direct message)\s+(?:data|file|information|content|document|report)\s+(?:to|at)':
+                    "instructions to email or message data to external recipients",
+
+                r'\b(?:share|transfer|copy)\s+(?:data|file|information|content|document)\s+(?:with|to)\s+(?:external|outside|third-party)':
+                    "instructions to share data with external parties",
+
+                r'\b(?:api|endpoint|webhook|callback)\s+(?:send|post|put)\s+(?:data|information|content)':
+                    "instructions to send data to external APIs or endpoints"
+            }
+
             for pattern in exfiltration_patterns:
                 if get_cached_regex(pattern).search(operation.instructions):
-                    logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Potential data exfiltration detected matching pattern: '{pattern}'")
+                    # Get a user-friendly description or use a generic one if pattern not found
+                    description = exfiltration_descriptions.get(pattern, "instructions that could send data outside the system")
+
+                    error_details = {
+                        "error_code": "data_exfiltration",
+                        "error_message": "Potential data exfiltration detected",
+                        "suggestions": [
+                            f"Remove {description}",
+                            "Use internal storage or approved data handling methods",
+                            "If data sharing is necessary, specify approved destinations",
+                            "Consider using guardrails to control data handling"
+                        ]
+                    }
+                    # Log the error with details
+                    logger.error(
+                        f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}",
+                        extra={
+                            'suggestions': error_details['suggestions'],
+                            'details': f"Detected {description} in your instructions"
+                        }
+                    )
+
                     self._record_security_incident("data_exfiltration", operation, pattern)
-                    return False
+                    return False, error_details
 
         # 5. Check for operations that might involve impersonation
         if self.security_profile in [SecurityProfile.STANDARD, SecurityProfile.HIGH, SecurityProfile.MAXIMUM]:
@@ -707,11 +1059,44 @@ class Squad:
                 r'\b(?:fake|forge|falsify|spoof)\s+(?:identity|credentials|authorization|authentication)',
             ]
 
+            # Create a mapping of patterns to user-friendly descriptions
+            impersonation_descriptions = {
+                r'\b(?:pretend|act|pose|impersonate)\s+(?:as|to be|like)\s+(?:another|different|other)\s+(?:expert|agent|user|person|entity)':
+                    "instructions to impersonate another expert or user",
+
+                r'\b(?:change|modify|alter|switch)\s+(?:identity|role|specialty|persona)':
+                    "instructions to change identity or role",
+
+                r'\b(?:fake|forge|falsify|spoof)\s+(?:identity|credentials|authorization|authentication)':
+                    "instructions to fake credentials or identity"
+            }
+
             for pattern in impersonation_patterns:
                 if get_cached_regex(pattern).search(operation.instructions):
-                    logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Potential impersonation attempt detected matching pattern: '{pattern}'")
+                    # Get a user-friendly description or use a generic one if pattern not found
+                    description = impersonation_descriptions.get(pattern, "instructions that involve impersonation")
+
+                    error_details = {
+                        "error_code": "impersonation_attempt",
+                        "error_message": "Potential impersonation attempt detected",
+                        "suggestions": [
+                            f"Remove {description}",
+                            "Use proper authentication and authorization methods",
+                            "If role-playing is necessary, use approved simulation methods",
+                            "Consider rephrasing to avoid terms like 'pretend', 'impersonate', or 'pose as'"
+                        ]
+                    }
+                    # Log the error with details
+                    logger.error(
+                        f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}",
+                        extra={
+                            'suggestions': error_details['suggestions'],
+                            'details': f"Detected {description} in your instructions"
+                        }
+                    )
+
                     self._record_security_incident("impersonation_attempt", operation, pattern)
-                    return False
+                    return False, error_details
 
         # 6. Check for operations that might involve manipulation of other experts
         if self.security_profile in [SecurityProfile.HIGH, SecurityProfile.MAXIMUM]:
@@ -721,11 +1106,44 @@ class Squad:
                 r'\b(?:exploit|take advantage of|leverage)\s+(?:vulnerability|weakness|flaw|bug)',
             ]
 
+            # Create a mapping of patterns to user-friendly descriptions
+            manipulation_descriptions = {
+                r'\b(?:manipulate|trick|deceive|fool)\s+(?:other|another|different)\s+(?:expert|agent)':
+                    "instructions to manipulate or trick other experts",
+
+                r'\b(?:bypass|circumvent|get around|evade)\s+(?:security|restriction|limitation|constraint)':
+                    "instructions to bypass security restrictions",
+
+                r'\b(?:exploit|take advantage of|leverage)\s+(?:vulnerability|weakness|flaw|bug)':
+                    "instructions to exploit vulnerabilities or weaknesses"
+            }
+
             for pattern in manipulation_patterns:
                 if get_cached_regex(pattern).search(operation.instructions):
-                    logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Potential expert manipulation attempt detected matching pattern: '{pattern}'")
+                    # Get a user-friendly description or use a generic one if pattern not found
+                    description = manipulation_descriptions.get(pattern, "instructions that involve manipulating system components")
+
+                    error_details = {
+                        "error_code": "expert_manipulation",
+                        "error_message": "Potential expert manipulation attempt detected",
+                        "suggestions": [
+                            f"Remove {description}",
+                            "Use proper collaboration methods instead of manipulation",
+                            "If you need to modify behavior, use approved configuration options",
+                            "Consider rephrasing to avoid terms like 'trick', 'deceive', 'bypass', or 'exploit'"
+                        ]
+                    }
+                    # Log the error with details
+                    logger.error(
+                        f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}",
+                        extra={
+                            'suggestions': error_details['suggestions'],
+                            'details': f"Detected {description} in your instructions"
+                        }
+                    )
+
                     self._record_security_incident("expert_manipulation", operation, pattern)
-                    return False
+                    return False, error_details
 
         # 7. Check for operations that might involve unauthorized access
         if self.security_profile in [SecurityProfile.HIGH, SecurityProfile.MAXIMUM]:
@@ -735,21 +1153,72 @@ class Squad:
                 r'\b(?:escalate|elevate|increase)\s+(?:privilege|permission|access|authorization)',
             ]
 
+            # Create a mapping of patterns to user-friendly descriptions
+            unauthorized_descriptions = {
+                r'\b(?:access|retrieve|obtain|get)\s+(?:unauthorized|restricted|confidential|classified|private)\s+(?:data|information|content|document)':
+                    "instructions to access restricted or confidential data",
+
+                r'\b(?:hack|crack|break into|infiltrate)\s+(?:system|database|account|server)':
+                    "instructions to hack or infiltrate systems",
+
+                r'\b(?:escalate|elevate|increase)\s+(?:privilege|permission|access|authorization)':
+                    "instructions to escalate privileges or permissions"
+            }
+
             for pattern in unauthorized_access_patterns:
                 if get_cached_regex(pattern).search(operation.instructions):
-                    logger.error(f"⚠️ SECURITY WARNING: Operation security validation failed: Potential unauthorized access attempt detected matching pattern: '{pattern}'")
+                    # Get a user-friendly description or use a generic one if pattern not found
+                    description = unauthorized_descriptions.get(pattern, "instructions that involve unauthorized access")
+
+                    error_details = {
+                        "error_code": "unauthorized_access",
+                        "error_message": "Potential unauthorized access attempt detected",
+                        "suggestions": [
+                            f"Remove {description}",
+                            "Use proper authentication and authorization methods",
+                            "If you need access to specific resources, request proper permissions",
+                            "Consider rephrasing to avoid terms like 'hack', 'crack', or 'infiltrate'"
+                        ]
+                    }
+                    # Log the error with details
+                    logger.error(
+                        f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}",
+                        extra={
+                            'suggestions': error_details['suggestions'],
+                            'details': f"Detected {description} in your instructions"
+                        }
+                    )
+
                     self._record_security_incident("unauthorized_access", operation, pattern)
-                    return False
+                    return False, error_details
 
         # 8. Verify operation authenticity if expert is assigned
         if self.security_checks.get("expert_validation", True) and hasattr(operation, 'expert') and operation.expert:
             if not self._verify_operation_authenticity(operation, operation.expert):
-                logger.error(f"Operation security validation failed: Operation authenticity verification failed")
+                error_details = {
+                    "error_code": "authenticity_failure",
+                    "error_message": "Operation authenticity verification failed",
+                    "suggestions": [
+                        "Ensure the operation is properly assigned to an expert",
+                        "Verify that the expert has the necessary permissions",
+                        "Check for potential tampering with the operation",
+                        "Try reassigning the operation to the expert"
+                    ]
+                }
+                # Log the error with details
+                logger.error(
+                    f"⚠️ SECURITY WARNING: Operation security validation failed: {error_details['error_message']}",
+                    extra={
+                        'suggestions': error_details['suggestions'],
+                        'details': "Operation authenticity verification failed"
+                    }
+                )
+
                 self._record_security_incident("authenticity_failure", operation, "failed_expert_verification")
-                return False
+                return False, error_details
 
         # All checks passed
-        return True
+        return True, None
 
     def _find_best_expert_for_operation(self, operation: Operation) -> Optional[Expert]:
         """

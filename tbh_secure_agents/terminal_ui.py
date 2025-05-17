@@ -265,13 +265,46 @@ class TerminalUI:
         else:
             print(result)
 
-    def print_security_warning(self, message: str):
-        """Print a security warning message."""
-        print(f"{self._apply_color(Icon.SECURITY, Color.YELLOW)} {self._apply_color('Security:', Color.YELLOW)} {message}")
+    def print_security_warning(self, message: str, suggestions: List[str] = None, details: str = None):
+        """
+        Print a security warning message with optional suggestions and details.
 
-    def print_error(self, message: str):
-        """Print an error message."""
-        print(f"{self._apply_color(Icon.ERROR, Color.RED)} {message}")
+        Args:
+            message (str): The security warning message to display
+            suggestions (List[str], optional): A list of suggestions to help resolve the security issue
+            details (str, optional): Additional details about the security issue
+        """
+        print(f"{self._apply_color('⚠️', Color.YELLOW)} {self._apply_color('SECURITY WARNING:', Color.YELLOW + Color.BOLD)} {message}")
+
+        if details:
+            # Print details with indentation
+            print(f"  {self._apply_color('Details:', Color.BRIGHT_YELLOW)} {details}")
+
+        if suggestions:
+            # Print a separator before suggestions
+            print(f"\n{self._apply_color('Recommended Actions:', Color.BRIGHT_YELLOW)}")
+
+            # Print each suggestion with a bullet point
+            for suggestion in suggestions:
+                print(f"  {self._apply_color('•', Color.BRIGHT_YELLOW)} {suggestion}")
+
+    def print_error(self, message: str, suggestions: List[str] = None):
+        """
+        Print an error message with optional suggestions.
+
+        Args:
+            message (str): The error message to display
+            suggestions (List[str], optional): A list of suggestions to help resolve the error
+        """
+        print(f"{self._apply_color(Icon.ERROR, Color.RED)} {self._apply_color(message, Color.BOLD)}")
+
+        if suggestions:
+            # Print a separator before suggestions
+            print(f"\n{self._apply_color('Suggestions:', Color.BRIGHT_YELLOW)}")
+
+            # Print each suggestion with a bullet point
+            for suggestion in suggestions:
+                print(f"  {self._apply_color('•', Color.BRIGHT_YELLOW)} {suggestion}")
 
     def print_success(self, message: str):
         """Print a success message."""
@@ -311,10 +344,23 @@ class TerminalUILogHandler(logging.Handler):
             return
 
         if record.levelno >= logging.ERROR:
-            terminal.print_error(msg)
+            # Check if this is a structured error message with suggestions
+            if hasattr(record, 'suggestions') and record.suggestions:
+                terminal.print_error(msg, record.suggestions)
+            else:
+                terminal.print_error(msg)
         elif record.levelno >= logging.WARNING:
             if "SECURITY WARNING" in msg:
-                terminal.print_security_warning(msg.replace("⚠️ SECURITY WARNING: ", ""))
+                # Check if this is a structured security warning with suggestions and details
+                if hasattr(record, 'suggestions') and record.suggestions:
+                    details = record.details if hasattr(record, 'details') else None
+                    terminal.print_security_warning(
+                        msg.replace("⚠️ SECURITY WARNING: ", ""),
+                        record.suggestions,
+                        details
+                    )
+                else:
+                    terminal.print_security_warning(msg.replace("⚠️ SECURITY WARNING: ", ""))
             else:
                 print(f"{terminal._apply_color(Icon.WARNING, Color.YELLOW)} {msg}")
         elif record.levelno >= logging.INFO:

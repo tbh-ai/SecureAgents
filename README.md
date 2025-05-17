@@ -45,6 +45,8 @@ Full documentation, including installation instructions, usage guides, and detai
 *   **[Security Features](./docs/security_features_comprehensive.md)**
 *   **[Guardrails Guide](./docs/guardrails_comprehensive.md)**
 *   **[Result Destination Guide](./docs/result_destination.md)**
+*   **[Error Messages Guide](./docs/error_messages_guide.md)**
+*   **[Security Profiles Guide](./docs/security_profiles_guide.md)**
 *   **[Version Changes](./docs/version_changes.md)**
 
 ## Examples

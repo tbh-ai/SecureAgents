@@ -4,7 +4,24 @@
 
 This document outlines the key changes and enhancements in the latest version of the TBH Secure Agents framework.
 
-## Version 0.3.1 (Latest)
+## Version 0.3.2 (Latest)
+
+### Enhanced User Experience
+
+- Improved error messages with user-friendly descriptions and clear recommendations
+- Replaced technical regex patterns with plain English descriptions in security warnings
+- Enhanced terminal UI to better display error messages and suggestions
+- Added detailed troubleshooting information for common security issues
+- Created comprehensive documentation for understanding and resolving error messages
+
+### Security Improvements
+
+- Enhanced security validation with more descriptive error messages
+- Improved error handling for security validation failures
+- Added more context to security warnings to help users understand and fix issues
+- Updated security profiles to provide better feedback when validation fails
+
+## Version 0.3.1
 
 ### Bug Fixes and Dependency Updates
 
