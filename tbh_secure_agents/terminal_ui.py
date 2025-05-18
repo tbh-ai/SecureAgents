@@ -265,14 +265,15 @@ class TerminalUI:
         else:
             print(result)
 
-    def print_security_warning(self, message: str, suggestions: List[str] = None, details: str = None):
+    def print_security_warning(self, message: str, suggestions: List[str] = None, details: str = None, recommendations: List[Dict[str, str]] = None):
         """
-        Print a security warning message with optional suggestions and details.
+        Print a security warning message with optional suggestions, details, and code recommendations.
 
         Args:
             message (str): The security warning message to display
             suggestions (List[str], optional): A list of suggestions to help resolve the security issue
             details (str, optional): Additional details about the security issue
+            recommendations (List[Dict[str, str]], optional): A list of code recommendations to fix the issue
         """
         print(f"{self._apply_color('⚠️', Color.YELLOW)} {self._apply_color('SECURITY WARNING:', Color.YELLOW + Color.BOLD)} {message}")
 
@@ -287,6 +288,29 @@ class TerminalUI:
             # Print each suggestion with a bullet point
             for suggestion in suggestions:
                 print(f"  {self._apply_color('•', Color.BRIGHT_YELLOW)} {suggestion}")
+
+        if recommendations:
+            # Print a separator before recommendations
+            print(f"\n{self._apply_color('Code Recommendations:', Color.BRIGHT_GREEN)}")
+
+            # Print each recommendation with a title, code, and explanation
+            for i, rec in enumerate(recommendations):
+                print(f"\n  {self._apply_color(f'Solution {i+1}: {rec.get('title', 'Fix Security Issue')}', Color.BRIGHT_GREEN)}")
+                print(f"  {self._apply_color('─' * 40, Color.BRIGHT_BLACK)}")
+
+                # Print the code with proper indentation
+                code_lines = rec.get('code', '# No code provided').split('\n')
+                for line in code_lines:
+                    print(f"{line}")
+
+                print(f"  {self._apply_color('─' * 40, Color.BRIGHT_BLACK)}")
+
+                # Print explanation and intent preservation
+                if 'explanation' in rec:
+                    print(f"  {self._apply_color('Explanation:', Color.BRIGHT_WHITE)} {rec['explanation']}")
+
+                if 'intent_preservation' in rec:
+                    print(f"  {self._apply_color('Intent Preservation:', Color.BRIGHT_WHITE)} {rec['intent_preservation']}")
 
     def print_error(self, message: str, suggestions: List[str] = None):
         """
@@ -313,6 +337,49 @@ class TerminalUI:
     def print_info(self, message: str):
         """Print an informational message."""
         print(f"{self._apply_color(Icon.INFO, Color.BLUE)} {message}")
+
+    def print_auto_fix_preview(self, original: str, fixed: str, intent_preservation: str, title: str = "Auto-Fix"):
+        """
+        Print a preview of an auto-fix.
+
+        Args:
+            original (str): The original operation instructions
+            fixed (str): The fixed operation instructions
+            intent_preservation (str): Description of how the intent is preserved
+            title (str): Title of the auto-fix
+        """
+        self.terminal_width = self._get_terminal_width()
+
+        # Print a header for the preview
+        print(f"\n{self._apply_color('AUTO-FIX PREVIEW:', Color.BRIGHT_BLUE + Color.BOLD)} {self._apply_color(title, Color.BRIGHT_BLUE)}")
+        print(self._apply_color("─" * self.terminal_width, Color.BRIGHT_BLACK))
+
+        # Print the original instructions
+        print(f"{self._apply_color('ORIGINAL:', Color.BRIGHT_RED + Color.BOLD)}")
+
+        # Truncate and format original instructions for better display
+        if len(original) > 500:
+            print(f"{original[:500]}...")
+        else:
+            print(original)
+
+        # Print the fixed instructions
+        print(f"\n{self._apply_color('FIXED:', Color.BRIGHT_GREEN + Color.BOLD)}")
+
+        # Format the fixed code for better display
+        fixed_lines = fixed.split('\n')
+        for line in fixed_lines[:20]:  # Show at most 20 lines
+            print(line)
+
+        if len(fixed_lines) > 20:
+            print(f"{self._apply_color(f'... {len(fixed_lines) - 20} more lines not shown', Color.BRIGHT_BLACK)}")
+
+        # Print intent preservation
+        print(f"\n{self._apply_color('INTENT PRESERVATION:', Color.BRIGHT_WHITE + Color.BOLD)} {intent_preservation}")
+
+        # Print a footer
+        print(self._apply_color("─" * self.terminal_width, Color.BRIGHT_BLACK))
+        print(f"{self._apply_color('Applying this fix...', Color.BRIGHT_BLUE)}")
 
     def update_operation_status(self, operation_id: str, status: str, progress: float = 0.0):
         """Update the status of an operation."""
@@ -352,15 +419,18 @@ class TerminalUILogHandler(logging.Handler):
         elif record.levelno >= logging.WARNING:
             if "SECURITY WARNING" in msg:
                 # Check if this is a structured security warning with suggestions and details
-                if hasattr(record, 'suggestions') and record.suggestions:
-                    details = record.details if hasattr(record, 'details') else None
-                    terminal.print_security_warning(
-                        msg.replace("⚠️ SECURITY WARNING: ", ""),
-                        record.suggestions,
-                        details
-                    )
-                else:
-                    terminal.print_security_warning(msg.replace("⚠️ SECURITY WARNING: ", ""))
+                # Get all the available information
+                suggestions = record.suggestions if hasattr(record, 'suggestions') else None
+                details = record.details if hasattr(record, 'details') else None
+                recommendations = record.recommendations if hasattr(record, 'recommendations') else None
+
+                # Print the security warning with all available information
+                terminal.print_security_warning(
+                    msg.replace("⚠️ SECURITY WARNING: ", ""),
+                    suggestions,
+                    details,
+                    recommendations
+                )
             else:
                 print(f"{terminal._apply_color(Icon.WARNING, Color.YELLOW)} {msg}")
         elif record.levelno >= logging.INFO:

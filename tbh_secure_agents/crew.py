@@ -23,6 +23,7 @@ from .security_profiles import (
     SecurityProfile, get_security_thresholds, get_security_checks,
     log_security_profile_info, get_cached_regex, cache_security_validation
 )
+from .security.security_recommender import SecurityRecommender
 
 # Get a logger for this module
 logger = logging.getLogger(__name__)
@@ -56,7 +57,9 @@ class Squad:
     """
     def __init__(self, experts: List[Expert], operations: List[Operation], process: str = 'sequential',
                  security_profile: str = 'standard', trust_verification: bool = False,
-                 result_destination: Optional[Dict[str, str]] = None, **kwargs):
+                 result_destination: Optional[Dict[str, str]] = None,
+                 enable_recommendations: bool = True, auto_fix: bool = False,
+                 preview_changes: bool = True, **kwargs):
         """
         Initialize a Squad with experts, operations, and security settings.
 
@@ -67,12 +70,24 @@ class Squad:
             security_profile (str): The security profile to use ('minimal', 'low', 'standard', 'high', 'maximum')
             trust_verification (bool): Whether to verify trust between experts
             result_destination (Optional[Dict[str, str]]): Configuration for result output
+            enable_recommendations (bool): Whether to enable security recommendations
+            auto_fix (bool): Whether to automatically fix security issues
+            preview_changes (bool): Whether to preview changes before applying auto-fixes
             **kwargs: Additional configuration options
         """
         self.experts = experts
         self.operations = operations
         self.process = process # Example: 'sequential', 'hierarchical'
         self.security_level_str = security_profile  # Store original string value
+
+        # Initialize recommendation system
+        self.enable_recommendations = enable_recommendations
+        self.auto_fix = auto_fix
+        self.preview_changes = preview_changes
+        self.recommender = SecurityRecommender() if (enable_recommendations or auto_fix) else None
+
+        # Store original operations for reference if auto-fix is enabled
+        self.original_operations = operations.copy() if auto_fix else None
 
         # For backward compatibility
         security_level = kwargs.get('security_level', security_profile)
@@ -997,6 +1012,35 @@ class Squad:
                         }
                     )
 
+                    # Add recommendations if enabled
+                    if self.enable_recommendations and self.recommender:
+                        recommendations = self.recommender.get_recommendation(
+                            error_code="dangerous_operation",
+                            operation_text=operation.instructions,
+                            context={
+                                "expert": operation.expert,
+                                "operation": operation,
+                                "error_details": error_details,
+                                "squad_security_profile": self.security_profile
+                            }
+                        )
+
+                        if recommendations:
+                            error_details["recommendations"] = recommendations
+                            logger.info(f"Added {len(recommendations)} recommendations for dangerous operation")
+
+                            # If auto-fix is enabled, try to apply the first recommendation
+                            if self.auto_fix and recommendations:
+                                fixed, new_operation = self._try_auto_fix(operation, recommendations[0], "dangerous_operation")
+
+                                if fixed:
+                                    # Replace the operation with the fixed version
+                                    self.operations[index] = new_operation
+                                    logger.info(f"Auto-fixed security issue in operation {index+1}")
+
+                                    # Re-validate the fixed operation
+                                    return self._validate_operation_security(new_operation, index)
+
                     self._record_security_incident("dangerous_operation", operation, pattern)
                     return False, error_details
 
@@ -1094,6 +1138,35 @@ class Squad:
                             'details': f"Detected {description} in your instructions"
                         }
                     )
+
+                    # Add recommendations if enabled
+                    if self.enable_recommendations and self.recommender:
+                        recommendations = self.recommender.get_recommendation(
+                            error_code="impersonation_attempt",
+                            operation_text=operation.instructions,
+                            context={
+                                "expert": operation.expert,
+                                "operation": operation,
+                                "error_details": error_details,
+                                "squad_security_profile": self.security_profile
+                            }
+                        )
+
+                        if recommendations:
+                            error_details["recommendations"] = recommendations
+                            logger.info(f"Added {len(recommendations)} recommendations for impersonation attempt")
+
+                            # If auto-fix is enabled, try to apply the first recommendation
+                            if self.auto_fix and recommendations:
+                                fixed, new_operation = self._try_auto_fix(operation, recommendations[0], "impersonation_attempt")
+
+                                if fixed:
+                                    # Replace the operation with the fixed version
+                                    self.operations[index] = new_operation
+                                    logger.info(f"Auto-fixed security issue in operation {index+1}")
+
+                                    # Re-validate the fixed operation
+                                    return self._validate_operation_security(new_operation, index)
 
                     self._record_security_incident("impersonation_attempt", operation, pattern)
                     return False, error_details
@@ -1219,6 +1292,91 @@ class Squad:
 
         # All checks passed
         return True, None
+
+    def _try_auto_fix(self, operation: Operation, recommendation: Dict[str, str], error_code: str) -> Tuple[bool, Optional[Operation]]:
+        """
+        Attempt to automatically fix a security issue with a complete replacement.
+
+        Args:
+            operation: The operation to fix
+            recommendation: The recommendation to apply
+            error_code: The type of security error
+
+        Returns:
+            Tuple[bool, Optional[Operation]]: Whether the fix was successful and the fixed operation
+        """
+        try:
+            # Create a new operation with the recommended code
+            new_instructions = self._create_fixed_instructions(operation, recommendation, error_code)
+
+            # Create a new operation with the fixed instructions
+            new_operation = Operation(
+                instructions=new_instructions,
+                expert=operation.expert,
+                context=operation.context
+            )
+
+            # If preview mode is enabled, show the changes
+            if self.preview_changes:
+                self._preview_auto_fix(operation, recommendation, error_code)
+
+            logger.info(f"Auto-fixed operation with recommendation: {recommendation['title']}")
+            return True, new_operation
+
+        except Exception as e:
+            logger.error(f"Failed to auto-fix operation: {e}")
+            return False, None
+
+    def _create_fixed_instructions(self, operation: Operation, recommendation: Dict[str, str], error_code: str) -> str:
+        """
+        Create fixed instructions based on a recommendation.
+
+        Args:
+            operation: The operation to fix
+            recommendation: The recommendation to apply
+            error_code: The type of security error
+
+        Returns:
+            str: The fixed instructions
+        """
+        return f"""
+# AUTO-FIXED OPERATION
+# Original operation had security issues and was replaced with a secure alternative
+# Security issue: {error_code}
+
+{recommendation['code']}
+
+# Note: This operation was automatically fixed by the security system.
+# Original instruction (for reference): {operation.instructions[:100]}...
+# Intent preservation: {recommendation.get('intent_preservation', 'Intent preserved with secure implementation.')}
+"""
+
+    def _preview_auto_fix(self, operation: Operation, recommendation: Dict[str, str], error_code: str) -> None:
+        """
+        Preview the changes that would be made by auto-fix.
+
+        Args:
+            operation: The operation to fix
+            recommendation: The recommendation to apply
+            error_code: The type of security error
+        """
+        # Create the new instructions that would be used
+        new_instructions = self._create_fixed_instructions(operation, recommendation, error_code)
+
+        # Log the preview
+        logger.info(f"PREVIEW OF AUTO-FIX:")
+        logger.info(f"ORIGINAL:\n{operation.instructions[:200]}...")
+        logger.info(f"FIXED:\n{new_instructions[:200]}...")
+        logger.info(f"INTENT PRESERVATION: {recommendation.get('intent_preservation', 'Intent preserved with secure implementation.')}")
+
+        # Display the preview in the terminal UI if available
+        if hasattr(terminal, 'print_auto_fix_preview'):
+            terminal.print_auto_fix_preview(
+                original=operation.instructions,
+                fixed=new_instructions,
+                intent_preservation=recommendation.get('intent_preservation', 'Intent preserved with secure implementation.'),
+                title=recommendation.get('title', 'Auto-Fix')
+            )
 
     def _find_best_expert_for_operation(self, operation: Operation) -> Optional[Expert]:
         """
