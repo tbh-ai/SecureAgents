@@ -149,6 +149,15 @@ Thumbs.db
 # Output directories
 examples/output/
 output/
+outputs/
+outputs/*/
+visualization_examples/
+security_reports/
+framework_integration_results/
+test_outputs/
+profile_test_output/
+profile_test_results/
+improved_validation_output/
 
 # PyPI credentials
 .pypirc

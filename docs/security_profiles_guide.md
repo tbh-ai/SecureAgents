@@ -4,6 +4,8 @@
 
 The `tbh_secure_agents` framework includes a `security_profile` parameter in the `Expert` class constructor and a `security_level` parameter in the `Squad` class constructor. These parameters are key parts of the framework's security-first design, providing a mechanism for defining and enforcing different security constraints and capabilities.
 
+> **Note**: Some features described in this guide are currently in beta and may not be available in the public release. These features are marked with [BETA].
+
 **Current Status:** Enhanced Implementation
 
 The security profiles system has been enhanced to provide more flexibility while maintaining strong security. The framework now offers a spectrum of security profiles from minimal (for development and testing) to maximum (for highly sensitive applications).
@@ -20,7 +22,7 @@ The TBH Secure Agents framework now includes the following standardized security
 | **High** | `"high"` | Strict security validation | Sensitive applications |
 | **Maximum** | `"maximum"` | Most stringent security | Highly sensitive applications |
 
-### Legacy Profile Mapping
+### Legacy Profile Mapping [BETA]
 
 For backward compatibility, the framework maps legacy profile names to the new standardized profiles:
 

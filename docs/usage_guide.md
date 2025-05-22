@@ -1,8 +1,29 @@
-# Usage Guide
+# TBH Secure Agents Usage Guide
 
 ![TBH Secure Agents Logo](./assets/logo.png)
 
-This guide explains the core concepts of `tbh_secure_agents` and how to use them to build your multi-agent system.
+This guide explains the core concepts of `tbh_secure_agents` and how to use them to build secure multi-agent systems.
+
+## Table of Contents
+
+1. [Core Concepts](#core-concepts)
+2. [Basic Workflow](#basic-workflow)
+3. [Example](#example)
+4. [Advanced Features](#advanced-features)
+   - [Guardrails](#guardrails)
+   - [Result Destination](#result-destination)
+   - [Security Profiles](#security-profiles)
+5. [Next Steps](#next-steps)
+
+## Quick Start
+
+```bash
+# Install the package
+pip install tbh-secure-agents
+
+# Set your API key as an environment variable (recommended)
+export GOOGLE_API_KEY="your-api-key"
+```
 
 ## Core Concepts
 
@@ -64,14 +85,14 @@ Building an application with `tbh_secure_agents` typically involves these steps:
         instructions='Research and identify the top 3 AI security vulnerabilities reported in the last month.',
         output_format='A list of the top 3 vulnerabilities with brief descriptions.',
         expert=researcher, # Assign expert
-        result_destination='research_findings.md' # Save result to a markdown file
+        result_destination='outputs/research_findings.md' # Save result to a markdown file
     )
 
     operation2 = Operation(
         instructions='Based on the research findings, write a concise 2-paragraph summary for a non-technical audience.',
         output_format='A short summary explaining the vulnerabilities simply.',
         expert=writer, # Assign expert
-        result_destination='executive_summary.html' # Save result to an HTML file
+        result_destination='outputs/executive_summary.html' # Save result to an HTML file
         # Context will be passed automatically by the Squad in sequential mode
     )
     ```
@@ -84,7 +105,7 @@ Building an application with `tbh_secure_agents` typically involves these steps:
         process='sequential',
         result_destination={
             "format": "json",
-            "file_path": "output/squad_result.json"
+            "file_path": "outputs/squad_result.json"
         }
     )
     ```
@@ -117,9 +138,104 @@ Building an application with `tbh_secure_agents` typically involves these steps:
 
 ## Example
 
-Refer to the example scripts provided in the repository (e.g., `example_usage.py`, `example_usage_2.py`) for practical demonstrations of these concepts. The first example (`example_usage.py`) implements the Researcher/Writer scenario described above.
+The TBH Secure Agents framework includes a variety of examples in the `examples/` directory. Here's a simple example that demonstrates the core concepts:
+
+```python
+from tbh_secure_agents import Expert, Operation, Squad
+import os
+
+# Create outputs directory
+os.makedirs("outputs/examples", exist_ok=True)
+
+# Define experts with specific specialties
+researcher = Expert(
+    specialty="Security Researcher",
+    objective="Research security vulnerabilities",
+    security_profile="standard"
+)
+
+writer = Expert(
+    specialty="Technical Writer",
+    objective="Create clear documentation",
+    security_profile="standard"
+)
+
+# Define operations with clear instructions
+research_operation = Operation(
+    instructions="Identify the top 3 security vulnerabilities in LLM applications",
+    output_format="A numbered list with brief descriptions",
+    expert=researcher,
+    result_destination="outputs/examples/vulnerabilities.md"
+)
+
+summary_operation = Operation(
+    instructions="Create a non-technical summary of the security vulnerabilities",
+    output_format="A concise summary for executives",
+    expert=writer,
+    result_destination="outputs/examples/executive_summary.html"
+)
+
+# Create a squad to orchestrate the operations
+security_squad = Squad(
+    experts=[researcher, writer],
+    operations=[research_operation, summary_operation],
+    process="sequential",
+    result_destination={
+        "format": "json",
+        "file_path": "outputs/examples/security_report.json"
+    }
+)
+
+# Deploy the squad
+result = security_squad.deploy()
+print(f"Squad execution complete. Results saved to outputs/examples directory.")
+```
+
+For more examples, check the `examples/` directory in the repository:
+- `examples/basic/` - Simple examples demonstrating core functionality
+- `examples/advanced/` - More complex examples showcasing advanced features
+- `examples/security/` - Examples focused on security features
 
 ## Advanced Features
+
+### Security Profiles
+
+Security profiles are a key feature of the TBH Secure Agents framework, providing different levels of security validation for different use cases:
+
+```python
+# Create an expert with minimal security for development
+dev_expert = Expert(
+    specialty="Developer",
+    objective="Write code",
+    security_profile="minimal"  # For development and testing
+)
+
+# Create an expert with standard security (default)
+standard_expert = Expert(
+    specialty="Research Assistant",
+    objective="Gather information"
+    # security_profile defaults to "standard" if not specified
+)
+
+# Create an expert with high security for sensitive tasks
+secure_expert = Expert(
+    specialty="Financial Analyst",
+    objective="Process financial data",
+    security_profile="high"  # For sensitive applications
+)
+```
+
+Available security profiles:
+
+| Profile | Value | Description | Use Case |
+|---------|-------|-------------|----------|
+| **Minimal** | `"minimal"` | Only critical security checks | Development and testing |
+| **Low** | `"low"` | Basic security checks | Non-sensitive applications |
+| **Standard** | `"standard"` | Balanced security (default) | General purpose applications |
+| **High** | `"high"` | Strict security validation | Sensitive applications |
+| **Maximum** | `"maximum"` | Most stringent security | Highly sensitive applications |
+
+For more details on security profiles, see the [Security Profiles Guide](./security_profiles_guide.md).
 
 ### Guardrails
 
@@ -138,7 +254,7 @@ guardrails = {
 result = squad.deploy(guardrails=guardrails)
 ```
 
-For more details on using guardrails, see the [Guardrails Guide](./guardrails_guide.md).
+For more details on using guardrails, see the [Guardrails Guide](./guardrails_comprehensive.md).
 
 ### Result Destination
 
@@ -154,7 +270,7 @@ report_operation = Operation(
     instructions="Create a comprehensive report on renewable energy technologies.",
     output_format="A detailed report with sections and subsections",
     expert=energy_expert,
-    result_destination="reports/renewable_energy_report.md"
+    result_destination="outputs/reports/renewable_energy_report.md"
 )
 
 # Create an operation that saves its result as JSON data
@@ -162,7 +278,7 @@ data_operation = Operation(
     instructions="Analyze the energy consumption data and provide key metrics.",
     output_format="A JSON object with analysis results",
     expert=data_analyst,
-    result_destination="data/energy_analysis.json"
+    result_destination="outputs/data/energy_analysis.json"
 )
 ```
 
@@ -178,7 +294,7 @@ analysis_squad = Squad(
     process="sequential",
     result_destination={
         "format": "json",
-        "file_path": "output/energy_analysis_result.json"
+        "file_path": "outputs/energy_analysis_result.json"
     }
 )
 
@@ -189,7 +305,7 @@ report_squad = Squad(
     process="sequential",
     result_destination={
         "format": "pdf",
-        "file_path": "reports/final_report.pdf"
+        "file_path": "outputs/reports/final_report.pdf"
     }
 )
 ```
@@ -211,9 +327,33 @@ For more details on using the result destination feature, see the [Result Destin
 
 ## Next Steps
 
-*   Explore implementing custom security profiles.
-*   Investigate adding tools to experts.
-*   Experiment with different expert roles and operation sequences.
-*   Try using guardrails to dynamically control expert behavior.
-*   Use the result_destination parameter to save operation and squad results to files.
-*   Refer to the `security_features_comprehensive.md` document for details on the framework's security approach.
+Now that you understand the basics of the TBH Secure Agents framework, here are some next steps to explore:
+
+### Explore Advanced Security Features
+
+* Read the [Security Profiles Guide](./security_profiles_guide.md) to learn about different security levels
+* Check the [Security Guide](./security_guide.md) for best practices and advanced security configuration
+* Explore the [Hybrid Security Validation](./hybrid_security_validation.md) system for enhanced security [BETA]
+* Try the security visualization features for beautiful HTML reports [BETA]
+* Implement custom security profiles for your specific security requirements
+
+### Experiment with Different Configurations
+
+* Try different expert roles and specialties
+* Experiment with various operation sequences
+* Test different security profiles to find the right balance for your use case
+
+### Explore Example Code
+
+* Check the `examples/` directory for complete working examples:
+  * `examples/basic/` - Simple examples demonstrating core functionality
+  * `examples/advanced/` - More complex examples showcasing advanced features
+  * `examples/security/` - Examples focused on security features
+
+### Integrate with Your Projects
+
+* Use the framework in your own projects
+* Implement custom tools for your experts
+* Create domain-specific experts for your use cases
+
+For more detailed information on specific topics, refer to the other documentation files in the `docs/` directory.

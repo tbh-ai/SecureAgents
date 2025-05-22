@@ -36,29 +36,41 @@ Note that the package name uses hyphens (`tbh-secure-agents`) rather than unders
 
 This package is licensed under the Apache License 2.0 with a custom addendum. While the code is open source, it includes specialized security implementations designed to protect multi-agent systems. The package provides you with the necessary interfaces and components to build secure multi-agent systems.
 
-## Documentation
+## Project Structure
 
-Full documentation, including installation instructions, usage guides, and details on the security focus, can be found in the `docs/` directory:
+The TBH Secure Agents framework is organized into the following directories:
 
-*   **[Installation Guide](./docs/installation.md)**
-*   **[Usage Guide](./docs/usage_guide.md)**
-*   **[Security Features](./docs/security_features_comprehensive.md)**
-*   **[Guardrails Guide](./docs/guardrails_comprehensive.md)**
-*   **[Result Destination Guide](./docs/result_destination.md)**
-*   **[Error Messages Guide](./docs/error_messages_guide.md)**
-*   **[Security Profiles Guide](./docs/security_profiles_guide.md)**
-*   **[Version Changes](./docs/version_changes.md)**
+* **`tbh_secure_agents/`**: Core package code
+  * **`security/`**: Security-related components
+  * **`security_validation/`**: Security validation system
+  * **`security_profiles/`**: Security profile definitions and management
 
-## Examples
+* **`docs/`**: Comprehensive documentation
+  * **[Installation Guide](./docs/installation.md)**
+  * **[Usage Guide](./docs/usage_guide.md)**
+  * **[Security Features](./docs/security_features_comprehensive.md)**
+  * **[Guardrails Guide](./docs/guardrails_comprehensive.md)**
+  * **[Result Destination Guide](./docs/result_destination.md)**
+  * **[Error Messages Guide](./docs/error_messages_guide.md)**
+  * **[Security Profiles Guide](./docs/security_profiles_guide.md)**
+  * **[Version Changes](./docs/version_changes.md)**
+  * **[Word Documentation](./docs/word_docs/)**: Microsoft Word versions of all documentation
 
-The `examples/` directory contains various examples demonstrating the framework's capabilities:
+* **`examples/`**: Example code demonstrating framework usage
+  * **[Basic Examples](./examples/basic/)**: Simple examples demonstrating core functionality
+  * **[Advanced Examples](./examples/advanced/)**: More complex examples showcasing advanced features
+  * **[Security Examples](./examples/security/)**: Examples focused on security features
+  * **[Result Destination Examples](./examples/result_destination/)**: Examples demonstrating the result_destination feature
+  * **[Guardrails Examples](./examples/guardrails/)**: Examples showing how to use guardrails
 
-*   **[Basic Examples](./examples/basic/)**: Simple examples demonstrating core functionality
-*   **[Advanced Examples](./examples/advanced/)**: More complex examples showcasing advanced features
-*   **[Security Examples](./examples/security/)**: Examples focused on security features
-*   **[Result Destination Examples](./examples/result_destination/)**: Examples demonstrating the result_destination feature
-*   **[Guardrails Examples](./examples/guardrails/)**: Examples showing how to use guardrails
-*   **[New Version Example](./examples/new_version_example.py)**: A simple, readable example demonstrating all the key features of the latest version
+* **`tests/`**: Comprehensive test suite
+  * Unit tests, integration tests, and security validation tests
+
+* **`scripts/`**: Utility scripts for development and maintenance
+  * Build scripts, update scripts, and other utilities
+
+* **`outputs/`**: Directory for generated outputs (not included in repository)
+  * Generated reports, visualizations, and test results
 
 ## Getting Started (Quick Example)
 
@@ -68,8 +80,8 @@ Here's a simple example of how to use the package:
 from tbh_secure_agents import Expert, Operation, Squad
 import os
 
-# Create output directory
-os.makedirs("output", exist_ok=True)
+# Create outputs directory
+os.makedirs("outputs/examples", exist_ok=True)
 
 # Define experts with specific specialties and security profiles
 content_writer = Expert(
@@ -91,14 +103,14 @@ content_operation = Operation(
     instructions="Write a short blog post about the benefits of artificial intelligence in healthcare.",
     output_format="A well-structured blog post with a title, introduction, main points, and conclusion.",
     expert=content_writer,
-    result_destination="output/healthcare_ai_blog.md"  # Save result to a markdown file
+    result_destination="outputs/examples/healthcare_ai_blog.md"  # Save result to a markdown file
 )
 
 analysis_operation = Operation(
     instructions="Analyze the following data and provide insights: Patient wait times decreased by 30% after implementing AI scheduling. Diagnostic accuracy improved by 15%. Treatment planning time reduced by 25%.",
     output_format="A concise analysis with key insights and recommendations.",
     expert=data_analyst,
-    result_destination="output/healthcare_data_analysis.txt"  # Save result to a text file
+    result_destination="outputs/examples/healthcare_data_analysis.txt"  # Save result to a text file
 )
 
 # Create a squad with template variables in operations
@@ -126,7 +138,7 @@ template_operation = Operation(
     }
     """,
     expert=template_expert,
-    result_destination="output/healthcare_summary.html"  # Save result to an HTML file
+    result_destination="outputs/examples/healthcare_summary.html"  # Save result to an HTML file
 )
 
 # Form a squad with result destination
@@ -136,7 +148,7 @@ healthcare_squad = Squad(
     process="sequential",  # Operations run in sequence, passing results as context
     result_destination={
         "format": "json",
-        "file_path": "output/healthcare_squad_result.json"  # Save squad result to a JSON file
+        "file_path": "outputs/examples/healthcare_squad_result.json"  # Save squad result to a JSON file
     }
 )
 
@@ -154,12 +166,33 @@ guardrails = {
 result = healthcare_squad.deploy(guardrails=guardrails)
 
 print("Squad result:", result[:100] + "...")  # Print a preview of the result
-print("Results saved to the output directory")
+print("Results saved to the outputs/examples directory")
 ```
 
 ## Contributing
 
-Contributions are welcome! Please see the `CONTRIBUTING.md` file (to be created) and refer to the documentation in the `docs/` directory for project structure and goals.
+Contributions are welcome! Please see the `CONTRIBUTING.md` file and follow these guidelines:
+
+1. **Code Organization**:
+   - Core package code goes in `tbh_secure_agents/`
+   - Tests go in `tests/`
+   - Examples go in `examples/`
+   - Documentation goes in `docs/`
+   - Utility scripts go in `scripts/`
+   - Generated outputs go in `outputs/` (not committed to repository)
+
+2. **Development Workflow**:
+   - Create a feature branch from `main`
+   - Write tests for new features
+   - Ensure all tests pass before submitting a pull request
+   - Update documentation as needed
+
+3. **Security Focus**:
+   - All contributions must maintain or enhance the security focus of the framework
+   - Follow security best practices in all code
+   - Document security implications of new features
+
+For more details, refer to the documentation in the `docs/` directory for project structure and goals.
 
 ## License
 

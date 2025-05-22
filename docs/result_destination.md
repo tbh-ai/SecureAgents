@@ -31,7 +31,7 @@ expert = Expert(
 operation = Operation(
     instructions="Write a short paragraph about artificial intelligence.",
     expert=expert,
-    result_destination="output/ai_paragraph.txt"
+    result_destination="outputs/ai_paragraph.txt"
 )
 
 # Execute the operation
@@ -79,7 +79,7 @@ squad = Squad(
     security_level="standard",
     result_destination={
         "format": "md",
-        "file_path": "output/squad_result.md"
+        "file_path": "outputs/squad_result.md"
     }
 )
 
@@ -170,25 +170,25 @@ expert = Expert(
 txt_operation = Operation(
     instructions="Create content about renewable energy in TXT format.",
     expert=expert,
-    result_destination="output/energy.txt"
+    result_destination="outputs/energy.txt"
 )
 
 md_operation = Operation(
     instructions="Create content about renewable energy in MD format.",
     expert=expert,
-    result_destination="output/energy.md"
+    result_destination="outputs/energy.md"
 )
 
 json_operation = Operation(
     instructions="Create content about renewable energy in JSON format.",
     expert=expert,
-    result_destination="output/energy.json"
+    result_destination="outputs/energy.json"
 )
 
 html_operation = Operation(
     instructions="Create content about renewable energy in HTML format.",
     expert=expert,
-    result_destination="output/energy.html"
+    result_destination="outputs/energy.html"
 )
 
 # Create a squad with all operations
@@ -205,11 +205,48 @@ result = squad.deploy()
 
 ## Best Practices
 
-1. **Use Absolute Paths**: To avoid path resolution issues, use absolute paths for the `file_path` parameter.
-2. **Create Output Directories**: Make sure the output directory exists before executing operations or deploying squads.
+1. **Use the outputs Directory**: Store all generated files in the `outputs` directory or its subdirectories to keep your project organized.
+   ```python
+   # Create the outputs directory if it doesn't exist
+   import os
+   os.makedirs("outputs", exist_ok=True)
+
+   # Use subdirectories for different types of outputs
+   os.makedirs("outputs/reports", exist_ok=True)
+   os.makedirs("outputs/data", exist_ok=True)
+   ```
+
+2. **Use Absolute Paths**: To avoid path resolution issues, use absolute paths for the `file_path` parameter.
+   ```python
+   import os
+
+   # Get the absolute path to the outputs directory
+   outputs_dir = os.path.abspath("outputs")
+
+   # Create a file path using the absolute path
+   file_path = os.path.join(outputs_dir, "report.md")
+   ```
+
 3. **Choose Appropriate Formats**: Select the format that best suits your needs:
    - Use `.txt` or `.md` for simple text output
    - Use `.html` for formatted output that can be viewed in a browser
    - Use `.json` for structured data that can be processed by other systems
    - Use `.pdf` for professional reports
-4. **Handle Errors**: Check the return value of the `_save_result_to_destination` method to ensure the result was saved successfully.
+
+4. **Handle Errors**: Check the return value of the operation or squad execution to ensure the result was saved successfully.
+   ```python
+   try:
+       result = operation.execute()
+       print(f"Result saved to {operation.result_destination}")
+   except Exception as e:
+       print(f"Error saving result: {e}")
+   ```
+
+5. **Use Meaningful File Names**: Use descriptive file names that include relevant information such as date, content type, or purpose.
+   ```python
+   import datetime
+
+   # Generate a file name with the current date
+   today = datetime.datetime.now().strftime("%Y-%m-%d")
+   file_name = f"outputs/reports/energy_report_{today}.md"
+   ```

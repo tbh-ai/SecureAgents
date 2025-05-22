@@ -75,12 +75,12 @@ class SecurityProfile(Enum):
             Description string
         """
         descriptions = {
-            cls.MINIMAL: "Minimal security checks. Only critical exploits are prevented. Not recommended for production.",
-            cls.LOW: "Low security. Basic structural validation without detailed content analysis.",
-            cls.STANDARD: "Standard security. Balance between security and usability.",
-            cls.HIGH: "High security. Strict validation with comprehensive checks.",
-            cls.MAXIMUM: "Maximum security. Most stringent validation with additional checks.",
-            cls.CUSTOM: "Custom security profile with user-defined settings."
+            cls.MINIMAL: "Development-friendly security profile optimized for rapid iteration. Prioritizes code execution with light security awareness for critical exploits only.",
+            cls.LOW: "Streamlined security profile with basic protection against system commands and critical vulnerabilities while maintaining high code compatibility.",
+            cls.STANDARD: "Balanced security profile suitable for most use cases. Provides moderate protection with reasonable workflow compatibility.",
+            cls.HIGH: "Enhanced security profile with comprehensive protection mechanisms. Recommended for handling sensitive operations with strong security requirements.",
+            cls.MAXIMUM: "Enterprise-grade security profile with advanced protection layers. Ideal for production environments with strict security requirements and regulatory compliance needs.",
+            cls.CUSTOM: "Custom security profile with user-defined settings tailored to specific requirements."
         }
         return descriptions.get(profile, "Unknown security profile")
 
@@ -187,25 +187,25 @@ def get_security_thresholds(profile: SecurityProfile, profile_name: Optional[str
     # Define thresholds for different security profiles
     thresholds = {
         SecurityProfile.MINIMAL: {
-            "injection_score": 0.9,       # Only block very obvious injections
-            "sensitive_data": 0.9,        # Only block very obvious sensitive data
-            "relevance_score": 0.1,       # Very permissive relevance check
-            "reliability_score": 0.1,     # Very permissive reliability check
-            "consistency_score": 0.1,     # Very permissive consistency check
+            "injection_score": 0.98,      # Only block the most extreme injections
+            "sensitive_data": 0.98,       # Only block the most extreme sensitive data
+            "relevance_score": 0.02,      # Extremely permissive relevance check
+            "reliability_score": 0.02,    # Extremely permissive reliability check
+            "consistency_score": 0.02,    # Extremely permissive consistency check
         },
         SecurityProfile.LOW: {
-            "injection_score": 0.8,       # Block obvious injections
-            "sensitive_data": 0.7,        # Block obvious sensitive data
-            "relevance_score": 0.2,       # Permissive relevance check
-            "reliability_score": 0.3,     # Permissive reliability check
-            "consistency_score": 0.3,     # Permissive consistency check
+            "injection_score": 0.85,      # Block obvious injections
+            "sensitive_data": 0.85,       # Block obvious sensitive data
+            "relevance_score": 0.15,      # Permissive relevance check
+            "reliability_score": 0.15,    # Permissive reliability check
+            "consistency_score": 0.15,    # Permissive consistency check
         },
         SecurityProfile.STANDARD: {
-            "injection_score": 0.6,       # Moderate injection detection
-            "sensitive_data": 0.5,        # Moderate sensitive data detection
-            "relevance_score": 0.4,       # Standard relevance check
-            "reliability_score": 0.5,     # Standard reliability check
-            "consistency_score": 0.5,     # Standard consistency check
+            "injection_score": 0.75,      # Block moderate injections
+            "sensitive_data": 0.75,       # Block moderate sensitive data
+            "relevance_score": 0.25,      # Moderate relevance check
+            "reliability_score": 0.25,    # Moderate reliability check
+            "consistency_score": 0.25,    # Moderate consistency check
         },
         SecurityProfile.HIGH: {
             "injection_score": 0.4,       # Strict injection detection
@@ -248,8 +248,8 @@ def get_security_checks(profile: SecurityProfile, profile_name: Optional[str] = 
     # Define which checks to perform for different security profiles
     checks = {
         SecurityProfile.MINIMAL: {
-            "critical_exploits": True,    # Always check for critical exploits
-            "system_commands": True,      # Always check for system commands
+            "critical_exploits": True,    # Check for critical exploits
+            "system_commands": False,     # Skip system commands check
             "content_analysis": False,    # Skip content analysis
             "format_validation": False,   # Skip format validation
             "context_validation": False,  # Skip context validation
@@ -257,20 +257,20 @@ def get_security_checks(profile: SecurityProfile, profile_name: Optional[str] = 
             "expert_validation": False,   # Skip expert validation
         },
         SecurityProfile.LOW: {
-            "critical_exploits": True,    # Always check for critical exploits
-            "system_commands": True,      # Always check for system commands
+            "critical_exploits": True,    # Check for critical exploits
+            "system_commands": True,      # Check for system commands
             "content_analysis": False,    # Skip content analysis
-            "format_validation": True,    # Perform format validation
+            "format_validation": False,   # Skip format validation
             "context_validation": False,  # Skip context validation
             "output_validation": False,   # Skip output validation
             "expert_validation": True,    # Perform expert validation
         },
         SecurityProfile.STANDARD: {
-            "critical_exploits": True,    # Always check for critical exploits
-            "system_commands": True,      # Always check for system commands
+            "critical_exploits": True,    # Check for critical exploits
+            "system_commands": True,      # Check for system commands
             "content_analysis": True,     # Perform content analysis
             "format_validation": True,    # Perform format validation
-            "context_validation": True,   # Perform context validation
+            "context_validation": False,  # Skip context validation
             "output_validation": True,    # Perform output validation
             "expert_validation": True,    # Perform expert validation
         },
@@ -408,9 +408,9 @@ def log_security_profile_info(profile: SecurityProfile, profile_name: Optional[s
     description = SecurityProfile.get_profile_description(profile)
 
     if profile == SecurityProfile.MINIMAL:
-        logger.warning(f"⚠️ MINIMAL SECURITY MODE: {description}")
+        logger.info(f"MINIMAL SECURITY MODE: {description}")
     elif profile == SecurityProfile.LOW:
-        logger.warning(f"⚠️ LOW SECURITY MODE: {description}")
+        logger.info(f"LOW SECURITY MODE: {description}")
     elif profile == SecurityProfile.STANDARD:
         logger.info(f"STANDARD SECURITY MODE: {description}")
     elif profile == SecurityProfile.HIGH:

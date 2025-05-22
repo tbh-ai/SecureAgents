@@ -3,7 +3,7 @@
 
 import logging
 
-__version__ = "0.3.2"
+__version__ = "0.4.0"
 
 # Import logging configuration
 from .logging_config import configure_logging
@@ -16,7 +16,23 @@ from .agent import Expert
 from .task import Operation
 from .crew import Squad
 
+# Expose security validation components
+from .security_validation import (
+    SecurityValidator,
+    SecurityReportGenerator,
+    LLMRecommendationGenerator
+)
+
 # Expose terminal UI for direct use in applications
 from .logging_config import get_terminal
 
-__all__ = ['Expert', 'Operation', 'Squad', '__version__', 'get_terminal']
+__all__ = [
+    'Expert',
+    'Operation',
+    'Squad',
+    'SecurityValidator',
+    'SecurityReportGenerator',
+    'LLMRecommendationGenerator',
+    '__version__',
+    'get_terminal'
+]

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Validation Report</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #dbeafe;
+            --success-color: #10b981;
+            --success-light: #d1fae5;
+            --danger-color: #ef4444;
+            --danger-light: #fee2e2;
+            --warning-color: #f59e0b;
+            --warning-light: #fef3c7;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h1 i {
+            margin-right: 0.75rem;
+        }
+
+        .logo {
+            height: 40px;
+            margin-right: 1rem;
+        }
+
+        .timestamp {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            flex: 1;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-right: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .summary-card:last-child {
+            margin-right: 0;
+        }
+
+        .summary-card.secure {
+            border-top: 4px solid var(--success-color);
+        }
+
+        .summary-card.insecure {
+            border-top: 4px solid var(--danger-color);
+        }
+
+        .summary-card.info {
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .summary-card i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-card.secure i {
+            color: var(--success-color);
+        }
+
+        .summary-card.insecure i {
+            color: var(--danger-color);
+        }
+
+        .summary-card.info i {
+            color: var(--primary-color);
+        }
+
+        .summary-card h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card p {
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: var(--primary-light);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header h2 i {
+            margin-right: 0.75rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-item h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-item p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        .performance-metrics {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+
+        .metric {
+            text-align: center;
+            flex: 1;
+        }
+
+        .metric h3 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric p {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .metric.fast p {
+            color: var(--success-color);
+        }
+
+        .metric.medium p {
+            color: var(--warning-color);
+        }
+
+        .metric.slow p {
+            color: var(--danger-color);
+        }
+
+        .threat-item {
+            background-color: var(--danger-light);
+            border-left: 4px solid var(--danger-color);
+            padding: 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .threat-item h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: var(--danger-color);
+        }
+
+        .threat-item h3 i {
+            margin-right: 0.5rem;
+        }
+
+        .threat-item .score {
+            display: inline-block;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .threat-item .description {
+            margin: 0;
+        }
+
+        .fix-suggestion, .llm-recommendation {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            border-radius: 0.25rem;
+        }
+
+        .fix-suggestion h3, .llm-recommendation h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .fix-suggestion h3 i, .llm-recommendation h3 i {
+            margin-right: 0.5rem;
+        }
+
+        .fix-suggestion p, .recommendation-content {
+            margin: 0;
+        }
+
+        .recommendation-content {
+            line-height: 1.8;
+        }
+
+        .recommendation-content h1, 
+        .recommendation-content h2, 
+        .recommendation-content h3 {
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .recommendation-content h1 {
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .recommendation-content h2 {
+            font-size: 1.25rem;
+        }
+
+        .recommendation-content h3 {
+            font-size: 1.1rem;
+        }
+
+        .recommendation-content ul, 
+        .recommendation-content ol {
+            padding-left: 1.5rem;
+        }
+
+        .recommendation-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-content code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .recommendation-content pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .footer img {
+            height: 30px;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .summary {
+                flex-direction: column;
+            }
+
+            .summary-card {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performance-metrics {
+                flex-direction: column;
+            }
+
+            .metric {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <img src="data:image/png;base64,{{logo_base64}}" alt="TBH Secure Agents" class="logo">
+                Security Validation Report
+            </h1>
+            <div class="timestamp">{{timestamp}}</div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-card {{#if is_secure}}secure{{else}}insecure{{/if}}">
+                <i class="fas {{#if is_secure}}fa-shield-check{{else}}fa-shield-exclamation{{/if}}"></i>
+                <h2>Security Status</h2>
+                <p>{{#if is_secure}}Secure{{else}}Insecure{{/if}}</p>
+            </div>
+            <div class="summary-card info">
+                <i class="fas fa-user-shield"></i>
+                <h2>Security Level</h2>
+                <p>{{security_level}}</p>
+            </div>
+            <div class="summary-card info">
+                <i class="fas fa-chart-line"></i>
+                <h2>Confidence</h2>
+                <p>{{confidence}}%</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-info-circle"></i> Validation Details</h2>
+            </div>
+            <div class="card-body">
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <h3>Validation Method</h3>
+                        <p>{{method}}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h3>Security Profile</h3>
+                        <p>{{security_level}}</p>
+                    </div>
+                    <div class="detail-item">
+                        <h3>Validation Time</h3>
+                        <p>{{validation_time}} ms</p>
+                    </div>
+                    <div class="detail-item">
+                        <h3>Confidence Score</h3>
+                        <p>{{confidence}}%</p>
+                    </div>
+                </div>
+
+                <h3>Validated Content</h3>
+                <div class="code-block">
+                    <pre>{{input_text}}</pre>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {{#if threats}}
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Threat Analysis</h2>
+            </div>
+            <div class="card-body">
+                {{#each threats}}
+                <div class="threat-item">
+                    <h3><i class="fas fa-shield-alt"></i> {{category}}</h3>
+                    <div class="score">Score: {{score}}</div>
+                    {{#if description}}
+                    <div class="description">{{description}}</div>
+                    {{/if}}
+                </div>
+                {{/each}}
+
+                <div class="chart-container">
+                    <canvas id="threatChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        {{#if fix_suggestion}}
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-wrench"></i> Fix Suggestion</h2>
+            </div>
+            <div class="card-body">
+                <div class="fix-suggestion">
+                    <h3><i class="fas fa-wrench"></i> Recommended Fix</h3>
+                    <p>{{fix_suggestion}}</p>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        {{#if llm_recommendation}}
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-robot"></i> Detailed Recommendation</h2>
+            </div>
+            <div class="card-body">
+                <div class="llm-recommendation">
+                    <h3><i class="fas fa-robot"></i> AI-Generated Recommendation</h3>
+                    <div class="recommendation-content">
+                        {{llm_recommendation}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        <div class="footer">
+            <img src="data:image/png;base64,{{logo_base64}}" alt="TBH Secure Agents">
+            <p>Generated by TBH Secure Agents Security Validation Framework</p>
+            <p>© 2025 TBH Secure Agents</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Mermaid
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'neutral',
+                securityLevel: 'loose',
+                flowchart: {
+                    htmlLabels: true,
+                    curve: 'basis'
+                }
+            });
+
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            const performanceChart = new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{performance_labels}},
+                    datasets: [{
+                        label: 'Validation Time (ms)',
+                        data: {{performance_data}},
+                        backgroundColor: [
+                            'rgba(37, 99, 235, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(239, 68, 68, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(37, 99, 235, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(239, 68, 68, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Time (ms)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Validation Performance'
+                        }
+                    }
+                }
+            });
+
+            {{#if threats}}
+            // Threat Chart
+            const threatCtx = document.getElementById('threatChart').getContext('2d');
+            const threatChart = new Chart(threatCtx, {
+                type: 'radar',
+                data: {
+                    labels: {{threat_labels}},
+                    datasets: [{
+                        label: 'Threat Score',
+                        data: {{threat_data}},
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(239, 68, 68, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 1
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Threat Analysis'
+                        }
+                    }
+                }
+            });
+            {{/if}}
+        });
+    </script>
+</body>
+</html>

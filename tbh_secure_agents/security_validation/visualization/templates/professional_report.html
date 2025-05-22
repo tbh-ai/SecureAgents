@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Validation Report</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #dbeafe;
+            --success-color: #10b981;
+            --success-light: #d1fae5;
+            --danger-color: #ef4444;
+            --danger-light: #fee2e2;
+            --warning-color: #f59e0b;
+            --warning-light: #fef3c7;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .header .timestamp {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background-color: var(--success-light);
+            color: var(--success-color);
+        }
+
+        .badge-danger {
+            background-color: var(--danger-light);
+            color: var(--danger-color);
+        }
+
+        .badge-warning {
+            background-color: var(--warning-light);
+            color: var(--warning-color);
+        }
+
+        .badge-primary {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .detail-item .label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-item .value {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .mermaid {
+            margin: 1.5rem 0;
+        }
+
+        .threat-item {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--danger-color);
+            background-color: var(--danger-light);
+        }
+
+        .threat-item h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .threat-item h3 i {
+            margin-right: 0.5rem;
+        }
+
+        .threat-item .score {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .threat-item .description {
+            font-size: 0.9rem;
+        }
+
+        .performance-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric {
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .metric .label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .metric .unit {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .fix-suggestion {
+            background-color: var(--success-light);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .fix-suggestion h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .fix-suggestion h3 i {
+            margin-right: 0.5rem;
+            color: var(--success-color);
+        }
+
+        .fix-suggestion p {
+            font-size: 0.9rem;
+        }
+
+        .llm-recommendation {
+            background-color: var(--primary-light);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .llm-recommendation h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .llm-recommendation h3 i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .recommendation-content {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .recommendation-content h1,
+        .recommendation-content h2,
+        .recommendation-content h3 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .recommendation-content code {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.85em;
+        }
+
+        .recommendation-content pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.85em;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+
+        .recommendation-section {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3b82f6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .recommendation-section h4 {
+            margin-top: 0;
+            color: #1e40af;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-section ul {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-left: 25px;
+        }
+
+        .recommendation-section li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .recommendation-section strong {
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performance-metrics {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; align-items: center;">
+                <img src="data:image/png;base64,{{logo_base64}}" alt="TBH.AI" style="height: 40px; margin-right: 15px;">
+                <h1>Security Validation Report</h1>
+            </div>
+            <div class="timestamp">{{timestamp}}</div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Validation Result</h2>
+                {{#if is_secure}}
+                <span class="badge badge-success"><i class="fas fa-check-circle"></i> Secure</span>
+                {{else}}
+                <span class="badge badge-danger"><i class="fas fa-exclamation-triangle"></i> Insecure</span>
+                {{/if}}
+            </div>
+            <div class="card-body">
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="label">Security Level</div>
+                        <div class="value">{{security_level}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">Validation Method</div>
+                        <div class="value">{{method}}</div>
+                    </div>
+                    {{#if confidence}}
+                    <div class="detail-item">
+                        <div class="label">Confidence</div>
+                        <div class="value">{{confidence}}</div>
+                    </div>
+                    {{/if}}
+                    {{#if threshold}}
+                    <div class="detail-item">
+                        <div class="label">Threshold</div>
+                        <div class="value">{{threshold}}</div>
+                    </div>
+                    {{/if}}
+                </div>
+
+                {{#if reason}}
+                <div class="detail-item">
+                    <div class="label">Reason</div>
+                    <div class="value">{{reason}}</div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Input Text</h2>
+            </div>
+            <div class="card-body">
+                <div class="code-block">{{input_text}}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Validation Flow</h2>
+            </div>
+            <div class="card-body">
+                <div class="mermaid">
+{{validation_flow}}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Performance Metrics</h2>
+            </div>
+            <div class="card-body">
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="label">Total Time</div>
+                        <div class="value">{{total_time}}</div>
+                        <div class="unit">ms</div>
+                    </div>
+                    {{#if regex_time}}
+                    <div class="metric">
+                        <div class="label">Regex Time</div>
+                        <div class="value">{{regex_time}}</div>
+                        <div class="unit">ms</div>
+                    </div>
+                    {{/if}}
+                    {{#if ml_time}}
+                    <div class="metric">
+                        <div class="label">ML Time</div>
+                        <div class="value">{{ml_time}}</div>
+                        <div class="unit">ms</div>
+                    </div>
+                    {{/if}}
+                    {{#if llm_time}}
+                    <div class="metric">
+                        <div class="label">LLM Time</div>
+                        <div class="value">{{llm_time}}</div>
+                        <div class="unit">ms</div>
+                    </div>
+                    {{/if}}
+                </div>
+
+                <div style="height: 300px; margin: 20px 0;">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {{#if threats}}
+        <div class="card">
+            <div class="card-header">
+                <h2>Threat Analysis</h2>
+            </div>
+            <div class="card-body">
+                {{#each threats}}
+                <div class="threat-item">
+                    <h3><i class="fas fa-shield-alt"></i> {{category}}</h3>
+                    <div class="score">Score: {{score}}</div>
+                    {{#if description}}
+                    <div class="description">{{description}}</div>
+                    {{/if}}
+                </div>
+                {{/each}}
+
+                <div style="height: 300px; margin: 20px 0;">
+                    <canvas id="threatChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        {{#if fix_suggestion}}
+        <div class="card">
+            <div class="card-header">
+                <h2>Fix Suggestion</h2>
+            </div>
+            <div class="card-body">
+                <div class="fix-suggestion">
+                    <h3><i class="fas fa-wrench"></i> Recommended Fix</h3>
+                    <p>{{fix_suggestion}}</p>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        {{#if llm_recommendation}}
+        <div class="card">
+            <div class="card-header">
+                <h2>Detailed Recommendation</h2>
+            </div>
+            <div class="card-body">
+                <div class="llm-recommendation">
+                    <h3><i class="fas fa-robot"></i> AI-Generated Recommendation</h3>
+                    <div class="recommendation-content">
+                        {{llm_recommendation}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+
+        <div class="footer">
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 10px;">
+                <img src="data:image/png;base64,{{logo_base64}}" alt="TBH.AI" style="height: 30px; margin-right: 10px;">
+                <span style="font-weight: bold; font-size: 1rem;">TBH.AI</span>
+            </div>
+            <p>Generated by TBH.AI Secure Agents Security Validation Framework</p>
+            <p>© 2025 TBH.AI</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Mermaid
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'neutral',
+                securityLevel: 'loose',
+                flowchart: {
+                    htmlLabels: true,
+                    curve: 'basis'
+                }
+            });
+
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            const performanceChart = new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Time', 'Regex Time', 'ML Time', 'LLM Time'],
+                    datasets: [{
+                        label: 'Validation Time (ms)',
+                        data: [{{total_time}}, {{regex_time}}, {{ml_time}}, {{llm_time}}],
+                        backgroundColor: [
+                            'rgba(37, 99, 235, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(245, 158, 11, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(37, 99, 235, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(245, 158, 11, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Time (ms)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Validation Performance'
+                        }
+                    }
+                }
+            });
+
+            // Threat Chart (if threats exist)
+            {{#if threats}}
+            const threatCtx = document.getElementById('threatChart');
+            if (threatCtx) {
+                const threatChart = new Chart(threatCtx.getContext('2d'), {
+                    type: 'radar',
+                    data: {
+                        labels: {{threat_labels}},
+                        datasets: [{
+                            label: 'Threat Score',
+                            data: {{threat_data}},
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(239, 68, 68, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: true
+                                },
+                                suggestedMin: 0,
+                                suggestedMax: 1
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Threat Analysis'
+                            }
+                        }
+                    }
+                });
+            }
+            {{/if}}
+        });
+    </script>
+</body>
+</html>
