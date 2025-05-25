@@ -1,0 +1,19 @@
+{
+  "result": {
+    "is_secure": true,
+    "method": "regex",
+    "response_time_ms": 0.012159347534179688,
+    "validation_performance": {
+      "total_time_ms": 0.5862712860107422,
+      "methods_used": [
+        "regex"
+      ],
+      "regex_time_ms": 0.012159347534179688,
+      "ml_time_ms": 0.0019073486328125,
+      "llm_time_ms": 0.2040863037109375
+    }
+  },
+  "security_level": "minimal",
+  "text": "Validate user input before processing it",
+  "timestamp": "2025-05-21T11:03:38.513147"
+}

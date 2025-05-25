@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Validation Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        # Validation Report
+
+## Input Text
+
+```
+Memory operation: write
+Memory: system_memory
+Data: {
+  "key": "settings",
+  "value": {
+    "debug": true,
+    "admin_password": "password123"
+  }
+}
+```
+
+## Validation Flow
+
+```mermaid
+graph TD
+    Input["Input Text"] --> Regex
+
+    %% Styling
+    classDef input fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef validator fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
+    classDef pass fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
+    classDef fail fill:#ffebee,stroke:#f44336,stroke-width:2px;
+    class Input input;
+    class Regex,ML,LLM validator;
+    class RegexPass,MLPass,LLMPass pass;
+    class RegexFail,MLFail,LLMFail fail;
+
+```
+
+## Validation Details
+
+- Security Level: high
+- Validation Method: llm
+- Is Secure: No
+- Confidence: 0.20
+- Threshold: 0.50
+- Reason: The primary security vulnerability is the storage of the `admin_password` in plain text, resulting in a high data exfiltration risk. The 'memory write' operation and the 'debug' flag also present potential security risks, rated at medium severity, if not handled correctly.
+
+## Validation Performance
+
+```mermaid
+pie
+    title Validation Time Distribution
+```
+
+- Total Time: 0.00 ms
+- Methods Used: 
+- Regex Time: 0.00 ms
+- ML Time: 0.00 ms
+- LLM Time: 0.00 ms
+## Fix Suggestion
+
+```
+Encrypt the 'value' field using a robust encryption algorithm like AES-256. Use a properly salted and hashed password for the 'admin_password', and store the password securely. Disable the debug mode in production environments and separate development and production configurations.
+```
+
+---
+
+Generated at: 2025-05-21 11:11:07
+    </div>
+    <script>
+        mermaid.initialize({startOnLoad:true});
+    </script>
+</body>
+</html>

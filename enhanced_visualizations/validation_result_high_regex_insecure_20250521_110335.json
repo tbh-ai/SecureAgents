@@ -1,0 +1,25 @@
+{
+  "result": {
+    "is_secure": false,
+    "method": "regex",
+    "reason": "Critical system command that could harm the system",
+    "matched_pattern": "(rm\\s+-rf\\s+/|format\\s+[a-z]:|\\bdd\\s+if|mkfs|system\\s*\\(|exec\\s*\\()",
+    "matched_text": "system(",
+    "highlighted_text": "Use >>>system(<<<'rm -rf /tmp/data') ",
+    "category": "critical_system_command",
+    "fix_suggestion": "Use secure file operations instead of system commands",
+    "response_time_ms": 0.22101402282714844,
+    "validation_performance": {
+      "total_time_ms": 7426.347970962524,
+      "methods_used": [
+        "regex"
+      ],
+      "regex_time_ms": 0.22101402282714844,
+      "ml_time_ms": 6.129026412963867,
+      "llm_time_ms": 7424.129009246826
+    }
+  },
+  "security_level": "high",
+  "text": "Use system('rm -rf /tmp/data') to clean up temporary files",
+  "timestamp": "2025-05-21T11:03:35.150121"
+}
