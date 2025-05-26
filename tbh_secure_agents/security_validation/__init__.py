@@ -12,10 +12,9 @@ provides a balance between performance, accuracy, and user experience.
 Key components:
 - Validators: Different validation approaches (regex, ML, LLM, hybrid)
 - SecurityValidator: Main interface for security validation
-- SecurityUI: User interface for displaying validation results
-- ReportGenerator: HTML report generation for security validation results
-- RecommendationGenerator: LLM-based recommendation generation
+- SecurityUI: Minimal user interface for displaying validation results
 - Integration: Functions for integrating with the existing framework
+Pure security focus - no visualization bloat.
 """
 
 from .validators import (
@@ -27,14 +26,11 @@ from .validators import (
 )
 from .utils import SecurityUI
 from .security_validator import SecurityValidator
-from .report_generator import SecurityReportGenerator
-from .recommendation_generator import LLMRecommendationGenerator, generate_basic_recommendation
 from .integration import (
     integrate_with_expert,
     integrate_with_squad,
     enable_hybrid_validation
 )
-from .hybrid_validator_improvements import enable_improved_hybrid_validation
 
 __all__ = [
     'SecurityValidator',
@@ -44,11 +40,7 @@ __all__ = [
     'LLMValidator',
     'HybridValidator',
     'SecurityUI',
-    'SecurityReportGenerator',
-    'LLMRecommendationGenerator',
-    'generate_basic_recommendation',
     'integrate_with_expert',
     'integrate_with_squad',
-    'enable_hybrid_validation',
-    'enable_improved_hybrid_validation'
+    'enable_hybrid_validation'
 ]

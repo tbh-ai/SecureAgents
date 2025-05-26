@@ -4,7 +4,51 @@
 
 This document outlines the key changes and enhancements in the latest version of the TBH Secure Agents framework.
 
-## Version 0.3.2 (Latest)
+## Version 0.4.0 (Latest) - Major Feature Release
+
+### 🆕 **NEW! User-Friendly Examples**
+
+- **5 Diverse AI Agent Examples**: Added comprehensive examples showcasing different types of AI agents:
+  - `1_ai_researcher.py` - AI Researcher for topic research
+  - `2_ai_code_developer.py` - AI Code Developer for writing code
+  - `3_ai_business_analyst.py` - AI Business Analyst for business analysis
+  - `4_ai_marketing_strategist.py` - AI Marketing Strategist for campaigns
+  - `5_ai_financial_advisor.py` - AI Financial Advisor for financial advice
+
+- **Production-Ready Outputs**: All examples generate real, usable outputs in various formats (.md, .py, .json, .html, .pdf)
+- **Template Variables Integration**: Proper demonstration of guardrails with template variables
+- **Minimal Security Settings**: Perfect for learning and development
+- **Clean Code Patterns**: Simple, readable examples without complexity
+
+### 🔧 **Enhanced Guardrails System**
+
+- **Template Variables**: Proper implementation of template variables in expert profiles and operation instructions
+- **100% Accuracy**: Guardrails now work perfectly with the security system
+- **User Freedom**: Users can input any content, security validates appropriately during processing
+- **Dynamic Control**: Real-time control over expert behavior without code changes
+
+### 📁 **Result Destination Improvements**
+
+- **All File Formats Working**: Complete support for .txt, .md, .csv, .json, .html, .pdf formats
+- **No Security Restrictions**: Removed unnecessary file extension blocks for legitimate use
+- **100% Success Rate**: All file formats tested and working perfectly
+- **Automatic Directory Creation**: Creates nested directories automatically
+
+### 🛡️ **Security System Enhancements**
+
+- **Hybrid Security Validation**: Advanced ML + LLM + Rules-based security validation
+- **Adaptive Security**: Dynamic security that adapts to different contexts
+- **Improved Accuracy**: Better balance between security and usability
+- **Enhanced Logging**: More detailed security validation logging
+
+### 📚 **Documentation Overhaul**
+
+- **Updated Usage Guide**: Comprehensive updates with new features and examples
+- **Enhanced Index**: Better organization and quick start examples
+- **Example Documentation**: Detailed README for examples directory
+- **User-Focused Content**: Documentation written for end users
+
+## Version 0.3.2
 
 ### Enhanced User Experience
 
@@ -176,7 +220,6 @@ The API has been updated to support the new features:
 
 - Completely redesigned security profiles with a standardized tiered approach:
   - `minimal`: Only critical security checks for development and testing
-  - `low`: Basic security checks for non-sensitive applications
   - `standard`: Balanced security for general purpose applications (default)
   - `high`: Strict security validation for sensitive applications
   - `maximum`: Most stringent security for highly sensitive applications

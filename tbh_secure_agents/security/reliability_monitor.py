@@ -39,36 +39,57 @@ class ReliabilityMonitor:
 
     def _initialize_thresholds(self) -> None:
         """Initialize detection thresholds based on security level."""
-        # Base thresholds for standard security level
-        self.thresholds = {
-            'consistency_threshold': 0.7,  # Minimum consistency score
-            'hallucination_threshold': 0.3,  # Maximum hallucination score
-            'repetition_threshold': 0.2,  # Maximum repetition score
-            'contradiction_threshold': 0.2,  # Maximum contradiction score
-            'execution_time_threshold': 300,  # Maximum execution time (seconds)
-            'output_length_threshold': 10000,  # Maximum output length (characters)
-            'error_rate_threshold': 0.2,  # Maximum error rate
+        # Define thresholds for all security profiles
+        profile_thresholds = {
+            'minimal': {
+                'consistency_threshold': 0.3,  # Very permissive for development
+                'hallucination_threshold': 0.8,  # Allow more hallucinations
+                'repetition_threshold': 0.5,  # Allow more repetition
+                'contradiction_threshold': 0.5,  # Allow more contradictions
+                'execution_time_threshold': 600,  # Longer execution time allowed
+                'output_length_threshold': 500000,  # Very large output allowed
+                'error_rate_threshold': 0.5,  # Higher error rate allowed
+            },
+            'low': {
+                'consistency_threshold': 0.5,  # Permissive consistency
+                'hallucination_threshold': 0.5,  # Moderate hallucination tolerance
+                'repetition_threshold': 0.3,  # Moderate repetition tolerance
+                'contradiction_threshold': 0.3,  # Moderate contradiction tolerance
+                'execution_time_threshold': 450,  # Moderate execution time
+                'output_length_threshold': 300000,  # Large output allowed
+                'error_rate_threshold': 0.3,  # Moderate error rate
+            },
+            'standard': {
+                'consistency_threshold': 0.7,  # Standard consistency requirement
+                'hallucination_threshold': 0.3,  # Standard hallucination tolerance
+                'repetition_threshold': 0.2,  # Standard repetition tolerance
+                'contradiction_threshold': 0.2,  # Standard contradiction tolerance
+                'execution_time_threshold': 300,  # Standard execution time
+                'output_length_threshold': 100000,  # Standard output length
+                'error_rate_threshold': 0.2,  # Standard error rate
+            },
+            'high': {
+                'consistency_threshold': 0.8,  # High consistency requirement
+                'hallucination_threshold': 0.2,  # Low hallucination tolerance
+                'repetition_threshold': 0.15,  # Low repetition tolerance
+                'contradiction_threshold': 0.15,  # Low contradiction tolerance
+                'execution_time_threshold': 180,  # Shorter execution time
+                'output_length_threshold': 50000,  # Smaller output length
+                'error_rate_threshold': 0.15,  # Lower error rate
+            },
+            'maximum': {
+                'consistency_threshold': 0.9,  # Very high consistency requirement
+                'hallucination_threshold': 0.1,  # Very low hallucination tolerance
+                'repetition_threshold': 0.1,  # Very low repetition tolerance
+                'contradiction_threshold': 0.1,  # Very low contradiction tolerance
+                'execution_time_threshold': 120,  # Very short execution time
+                'output_length_threshold': 25000,  # Very small output length
+                'error_rate_threshold': 0.1,  # Very low error rate
+            }
         }
 
-        # Adjust thresholds for higher security levels
-        if self.security_level == "high":
-            self.thresholds.update({
-                'consistency_threshold': 0.8,
-                'hallucination_threshold': 0.2,
-                'repetition_threshold': 0.15,
-                'contradiction_threshold': 0.15,
-                'execution_time_threshold': 180,
-                'error_rate_threshold': 0.15,
-            })
-        elif self.security_level == "maximum":
-            self.thresholds.update({
-                'consistency_threshold': 0.9,
-                'hallucination_threshold': 0.1,
-                'repetition_threshold': 0.1,
-                'contradiction_threshold': 0.1,
-                'execution_time_threshold': 120,
-                'error_rate_threshold': 0.1,
-            })
+        # Set thresholds based on security level
+        self.thresholds = profile_thresholds.get(self.security_level, profile_thresholds['standard'])
 
     def monitor_execution(self, operation_id: str, operation_type: str,
                          inputs: Dict[str, Any]) -> Dict[str, Any]:

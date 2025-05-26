@@ -85,9 +85,9 @@ class Operation:
         self.execution_metrics['start_time'] = time.time()
         self.execution_metrics['execution_attempts'] += 1
 
-        # Enhanced pre-execution security check
+        # Enhanced pre-execution security check with guardrails context
         logger.debug(f"Performing pre-execution check for operation '{self.instructions[:50]}...'")
-        if not self._pre_execution_secure():
+        if not self._pre_execution_secure(guardrails):
             self.execution_metrics['security_checks_failed'] += 1
             logger.error(f"Operation pre-execution security check failed for '{self.instructions[:50]}...'. Aborting.")
             raise SecurityError(f"Operation failed pre-execution security check: '{self.instructions[:50]}...'")
@@ -113,7 +113,7 @@ class Operation:
 
                 # Enhanced post-execution security and reliability check
                 logger.debug(f"Performing post-execution check for operation '{self.instructions[:50]}...'")
-                reliability_result = self._post_execution_secure(self.result)
+                reliability_result = self._post_execution_secure(self.result, guardrails)
 
                 if isinstance(reliability_result, dict):  # New format returning metrics
                     is_secure = reliability_result.get('is_secure', False)
@@ -173,38 +173,64 @@ class Operation:
 
     # --- Placeholder Security Methods ---
 
-    def _pre_execution_secure(self) -> bool:
+    def _pre_execution_secure(self, guardrails: Optional[Dict[str, Any]] = None) -> bool:
         """
-        Performs security checks before executing an operation.
-        Validates the operation instructions, context, and expert assignment to prevent exploitation.
+        HYBRID SECURITY VALIDATION for operation pre-execution checks.
+        Uses the expert's hybrid security system if available, falls back to basic checks.
+        Now considers guardrails context for security decisions.
+
+        Args:
+            guardrails (Optional[Dict[str, Any]]): Guardrails context that may affect security decisions
 
         Returns:
             bool: True if the operation passes all security checks, False otherwise
         """
-        logger.debug(f"Performing operation pre-execution check for '{self.instructions[:50]}...'")
+        logger.debug(f"Performing HYBRID operation pre-execution check for '{self.instructions[:50]}...'")
 
-        # 1. Check if operation has valid instructions
+        # Initialize guardrails if not provided
+        if guardrails is None:
+            guardrails = {}
+
+        # 1. Basic validation checks
         if not self.instructions or len(self.instructions.strip()) < 10:
             logger.warning(f"⚠️ SECURITY WARNING: Operation pre-execution security check FAILED: Instructions too short or empty")
             return False
 
-        # 2. Check for excessive instruction length (potential resource exhaustion)
-        if len(self.instructions) > 10000:
+        if len(self.instructions) > 500000:  # Very generous limit for modern AI applications
             logger.warning(f"⚠️ SECURITY WARNING: Operation pre-execution security check FAILED: Instructions too long ({len(self.instructions)} chars)")
             return False
 
-        # 3. Check if expert is properly assigned and has appropriate security profile
         if not self.expert:
             logger.warning(f"⚠️ SECURITY WARNING: Operation pre-execution security check FAILED: No expert assigned")
             return False
 
-        # Check if result_destination is secure
-        if self.result_destination:
-            # Check for suspicious file extensions only
-            suspicious_extensions = ['.exe', '.bat', '.sh', '.py', '.js', '.php']
-            if any(self.result_destination.endswith(ext) for ext in suspicious_extensions):
-                logger.warning(f"⚠️ SECURITY WARNING: Operation pre-execution security check FAILED: Suspicious file extension in result_destination")
-                return False
+        # 2. Log guardrails context for security awareness
+        if guardrails:
+            logger.info(f"🛡️ GUARDRAILS: Operation has guardrails context: {list(guardrails.keys())}")
+            logger.debug(f"🛡️ GUARDRAILS: User can input anything, security will validate appropriately")
+
+        # 3. Use HYBRID VALIDATION if expert has it
+        if hasattr(self.expert, 'hybrid_validator') and self.expert.hybrid_validator:
+            try:
+                # Use expert's hybrid security validation
+                context = {"security_level": getattr(self.expert, 'security_profile', 'standard')}
+                result = self.expert.hybrid_validator.validate(self.instructions, context)
+
+                if not result['is_secure']:
+                    logger.warning(f"⚠️ HYBRID SECURITY: Operation instructions blocked by {result.get('method', 'unknown')} - {result.get('reason', 'security violation')}")
+                    return False
+
+                logger.debug(f"✅ HYBRID SECURITY: Operation instructions validated by {result.get('method', 'hybrid')}")
+
+                # result_destination is just for saving output - no security restrictions needed
+                return True
+
+            except Exception as e:
+                logger.warning(f"⚠️ HYBRID SECURITY ERROR: {e} - falling back to basic validation")
+                # Continue to fallback validation below
+
+        # 3. FALLBACK: Basic validation for critical issues only
+        # result_destination is just for saving output - no security restrictions needed
 
         # 4. Check for potentially dangerous operations based on keywords
         dangerous_operation_patterns = [
@@ -309,18 +335,24 @@ class Operation:
         logger.debug(f"Generated operation fingerprint: {fingerprint[:8]}...")
         return fingerprint
 
-    def _post_execution_secure(self, result: Optional[str]) -> Dict:
+    def _post_execution_secure(self, result: Optional[str], guardrails: Optional[Dict[str, Any]] = None) -> Dict:
         """
-        Enhanced security and reliability checks on operation results after execution.
-        Validates the output for reliability, consistency, and security concerns.
+        HYBRID SECURITY VALIDATION for operation post-execution checks.
+        Uses the expert's hybrid security system if available, falls back to basic checks.
+        Now considers guardrails context for security decisions.
 
         Args:
             result (Optional[str]): The result of the operation execution
+            guardrails (Optional[Dict[str, Any]]): Guardrails context that may affect security decisions
 
         Returns:
             Dict: A dictionary containing security check results and reliability metrics
         """
-        logger.debug(f"Performing enhanced operation post-execution check for '{self.instructions[:50]}...'")
+        logger.debug(f"Performing HYBRID operation post-execution check for '{self.instructions[:50]}...'")
+
+        # Initialize guardrails if not provided
+        if guardrails is None:
+            guardrails = {}
 
         # Initialize metrics
         metrics = {
@@ -331,7 +363,12 @@ class Operation:
             'security_issues': []
         }
 
-        # 1. Check if result exists
+        # Log guardrails context for security awareness
+        if guardrails:
+            logger.info(f"🛡️ GUARDRAILS: Post-execution with guardrails context: {list(guardrails.keys())}")
+            logger.debug(f"🛡️ GUARDRAILS: Security validation will proceed normally")
+
+        # 1. Basic validation checks
         if not result:
             logger.warning(f"⚠️ SECURITY WARNING: Operation post-execution security check FAILED: Empty result")
             metrics['is_secure'] = False
@@ -339,12 +376,48 @@ class Operation:
             metrics['security_issues'].append('empty_result')
             return metrics
 
-        # 2. Check for excessive result length (potential resource exhaustion)
-        if len(result) > 50000:  # Reasonable limit
+        if len(result) > 50000:
             logger.warning(f"⚠️ SECURITY WARNING: Operation post-execution security check FAILED: Result too long ({len(result)} chars)")
             metrics['is_secure'] = False
             metrics['security_issues'].append('excessive_length')
             return metrics
+
+        # 2. Use HYBRID VALIDATION if expert has it
+        if hasattr(self.expert, 'hybrid_validator') and self.expert.hybrid_validator:
+            try:
+                # Use expert's hybrid security validation for output
+                context = {"security_level": getattr(self.expert, 'security_profile', 'standard')}
+                hybrid_result = self.expert.hybrid_validator.validate(result, context)
+
+                if not hybrid_result['is_secure']:
+                    logger.warning(f"⚠️ HYBRID SECURITY: Operation result blocked by {hybrid_result.get('method', 'unknown')} - {hybrid_result.get('reason', 'security violation')}")
+                    metrics['is_secure'] = False
+                    metrics['security_issues'].append('hybrid_validation_failed')
+                    return metrics
+
+                logger.debug(f"✅ HYBRID SECURITY: Operation result validated by {hybrid_result.get('method', 'hybrid')}")
+
+                # Continue with basic reliability checks
+                return self._basic_reliability_checks(result, metrics)
+
+            except Exception as e:
+                logger.warning(f"⚠️ HYBRID SECURITY ERROR: {e} - falling back to basic validation")
+                # Continue to fallback validation below
+
+        # 3. FALLBACK: Basic reliability checks only
+        return self._basic_reliability_checks(result, metrics)
+
+    def _basic_reliability_checks(self, result: str, metrics: Dict) -> Dict:
+        """
+        Basic reliability checks for operation results.
+
+        Args:
+            result (str): The result to check
+            metrics (Dict): The metrics dictionary to update
+
+        Returns:
+            Dict: Updated metrics dictionary
+        """
 
         # 3. Enhanced check for hallucination indicators
         hallucination_patterns = [

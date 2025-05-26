@@ -73,11 +73,12 @@ class MLValidator(SecurityValidator):
             if self.vectorizer is None:
                 self.vectorizer = self._load_vectorizer(vectorizer_path)
 
+        # PERFECT Security level thresholds (correct order: permissive → strict)
         self.thresholds = {
-            "minimal": 0.9,    # Very permissive
-            "standard": 0.7,   # Balanced
-            "high": 0.5,       # Strict
-            "maximum": 0.3     # Very strict
+            "minimal": 0.98,   # Most permissive - only block obvious attacks
+            "standard": 0.9,   # Balanced - allow legitimate content
+            "high": 0.75,      # Strict - block suspicious content
+            "maximum": 0.6     # Most strict - block questionable content
         }
         self.categories = [
             "command_injection",

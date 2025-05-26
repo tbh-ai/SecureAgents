@@ -2,12 +2,10 @@
 # Author: Saish (TBH.AI)
 
 """
-This file provides the Expert class for the TBH Secure Agents framework.
-It imports the actual implementation from agent.py for backward compatibility.
-
-Users should import Expert from tbh_secure_agents directly, not from this file.
-This file exists for documentation purposes to reflect the preferred terminology.
+Defines the core Expert class for the TBH Secure Agents framework.
+Experts encapsulate roles, goals, tools, and security contexts,
+utilizing Google Gemini as the LLM.
 """
 
-# Import everything from agent.py
+# Import everything from the agent module
 from .agent import *

@@ -45,7 +45,6 @@ The framework supports several security profiles to accommodate different securi
 | Profile | Value | Description | Use Cases |
 |---------|-------|-------------|-----------|
 | **Minimal** | `"minimal"` | Only critical security checks | Development and testing |
-| **Low** | `"low"` | Basic security checks | Non-sensitive applications |
 | **Standard** | `"standard"` | Balanced security (default) | General purpose applications |
 | **High** | `"high"` | Strict security validation | Sensitive applications |
 | **Maximum** | `"maximum"` | Most stringent security | Highly sensitive applications |
@@ -58,7 +57,7 @@ For backward compatibility, the framework maps legacy profile names to the new s
 |----------------|------------|
 | `default` | `standard` |
 | `development`, `testing` | `minimal` |
-| `basic` | `low` |
+| `basic` | `standard` |
 | `high_security`, `code_restricted` | `high` |
 | `maximum_security`, `air_gapped` | `maximum` |
 | All other specialized profiles | `standard` |

@@ -2,12 +2,9 @@
 # Author: Saish (TBH.AI)
 
 """
-This file provides the Squad class for the TBH Secure Agents framework.
-It imports the actual implementation from crew.py for backward compatibility.
-
-Users should import Squad from tbh_secure_agents directly, not from this file.
-This file exists for documentation purposes to reflect the preferred terminology.
+Defines the core Squad class for the TBH Secure Agents framework.
+Squads coordinate multiple experts and operations with security oversight.
 """
 
-# Import everything from crew.py
+# Import everything from the crew module
 from .crew import *

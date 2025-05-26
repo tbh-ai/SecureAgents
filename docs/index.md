@@ -6,11 +6,34 @@ Welcome to the TBH Secure Agents documentation. This framework provides tools an
 
 ## Getting Started
 
+- [Quick Start Guide](./quick_start.md) - **NEW!** Get started in 30 seconds
 - [Installation Guide](./installation.md) - How to install the framework
 - [Usage Guide](./usage_guide.md) - Core concepts and basic usage
 - [Version Changes](./version_changes.md) - What's new in each version
 
 > **Note**: Microsoft Word versions of all documentation are available in the [word_docs](./word_docs) directory. You can download them directly or convert the Markdown files to Word format using the instructions provided.
+
+## Quick Start Examples
+
+**NEW!** Try our user-friendly examples to get started quickly:
+
+```bash
+# Navigate to examples directory
+cd examples/user_friendly/
+
+# Run any of the 5 diverse AI agent examples:
+python3 1_ai_researcher.py      # AI Researcher - Research topics
+python3 2_ai_code_developer.py  # AI Developer - Write code
+python3 3_ai_business_analyst.py # AI Analyst - Business analysis
+python3 4_ai_marketing_strategist.py # AI Strategist - Marketing campaigns
+python3 5_ai_financial_advisor.py # AI Advisor - Financial advice
+```
+
+Each example demonstrates:
+- ✅ **Proper guardrails usage** with template variables
+- ✅ **Different file formats** (.md, .py, .json, .html, .pdf)
+- ✅ **Minimal security settings** for easy learning
+- ✅ **Real, usable outputs** generated automatically
 
 ## Security Features
 
@@ -23,8 +46,14 @@ Welcome to the TBH Secure Agents documentation. This framework provides tools an
 
 - [Guardrails Guide](./guardrails_comprehensive.md) - Using guardrails to control expert behavior
 - [Result Destination Guide](./result_destination.md) - Saving results to files
+- [Best Practices Guide](./best_practices.md) - **NEW!** Best practices for building AI agents
 - [Error Messages Guide](./error_messages_guide.md) - Understanding error messages
 - [Performance Optimization](./performance_optimization.md) - Optimizing performance
+
+## Help & Support
+
+- [FAQ](./faq.md) - **NEW!** Frequently asked questions and answers
+- [Troubleshooting](./security_guide.md#troubleshooting) - Common issues and solutions
 
 ## Project Structure
 
@@ -38,6 +67,7 @@ The TBH Secure Agents framework is organized into the following directories:
 - **`docs/`**: Comprehensive documentation (you are here)
 
 - **`examples/`**: Example code demonstrating framework usage
+  - **`user_friendly/`**: **NEW!** 5 simple, diverse AI agent examples ready to run
   - **`basic/`**: Simple examples demonstrating core functionality
   - **`advanced/`**: More complex examples showcasing advanced features
   - **`security/`**: Examples focused on security features

@@ -233,22 +233,41 @@ class HybridValidator(SecurityValidator):
             metrics["methods_used"].append("regex")
             validation_flow.append("Input->Regex")
 
+            # For minimal security profile, be extremely permissive
+            if security_level == "minimal":
+                # Only block the most critical system destruction patterns
+                critical_patterns = [
+                    r'rm\s+-rf\s+/',  # System destruction
+                    r'format\s+c:',   # Windows format
+                    r'del\s+/s\s+/q', # Windows delete all
+                ]
+
+                for pattern in critical_patterns:
+                    if re.search(pattern, text, re.IGNORECASE):
+                        result = {
+                            "is_secure": False,
+                            "method": "minimal_critical",
+                            "reason": "Critical system destruction pattern detected",
+                            "validation_metrics": metrics,
+                            "validation_flow": validation_flow
+                        }
+                        return result
+
+                # Allow everything else for minimal profile
+                result = {
+                    "is_secure": True,
+                    "method": "minimal_permissive",
+                    "validation_metrics": metrics,
+                    "validation_flow": validation_flow
+                }
+                return result
+
             # If regex finds issues and we're not forcing LLM, return immediately
             if not regex_result["is_secure"] and not force_llm:
                 metrics["total_time"] = time.time() - start_time
                 regex_result["validation_metrics"] = metrics
                 regex_result["validation_flow"] = validation_flow
                 return regex_result
-
-            # For minimal security profile without complex content, stop here
-            if security_level == "minimal" and not complexity_info.get("is_complex", False) and not force_llm:
-                result = {
-                    "is_secure": True,
-                    "method": "regex",
-                    "validation_metrics": metrics,
-                    "validation_flow": validation_flow
-                }
-                return result
 
             # Get ML result if running
             if run_ml:
@@ -332,6 +351,35 @@ class HybridValidator(SecurityValidator):
         metrics["methods_used"].append("regex")
         validation_flow.append("Input->Regex")
 
+        # For minimal security profile, be extremely permissive
+        if security_level == "minimal":
+            # Only block the most critical system destruction patterns
+            critical_patterns = [
+                r'rm\s+-rf\s+/',  # System destruction
+                r'format\s+c:',   # Windows format
+                r'del\s+/s\s+/q', # Windows delete all
+            ]
+
+            for pattern in critical_patterns:
+                if re.search(pattern, text, re.IGNORECASE):
+                    result = {
+                        "is_secure": False,
+                        "method": "minimal_critical",
+                        "reason": "Critical system destruction pattern detected",
+                        "validation_metrics": metrics,
+                        "validation_flow": validation_flow
+                    }
+                    return result
+
+            # Allow everything else for minimal profile
+            result = {
+                "is_secure": True,
+                "method": "minimal_permissive",
+                "validation_metrics": metrics,
+                "validation_flow": validation_flow
+            }
+            return result
+
         # If regex finds issues and we're not forcing LLM, return immediately with clear feedback
         if not regex_result["is_secure"] and not force_llm:
             # Complete metrics
@@ -339,16 +387,6 @@ class HybridValidator(SecurityValidator):
             regex_result["validation_metrics"] = metrics
             regex_result["validation_flow"] = validation_flow
             return regex_result
-
-        # For minimal security profile without complex content, stop here
-        if security_level == "minimal" and not complexity_info.get("is_complex", False) and not force_llm:
-            result = {
-                "is_secure": True,
-                "method": "regex",
-                "validation_metrics": metrics,
-                "validation_flow": validation_flow
-            }
-            return result
 
         # Step 2: ML validation for standard and higher security levels
         if security_level in ["standard", "high", "maximum"] or complexity_info.get("is_complex", False):
@@ -526,12 +564,34 @@ class HybridValidator(SecurityValidator):
             result["validation_flow"] = validation_flow
             return result
 
-        if security_level == "minimal" and not metrics["complexity_info"]["is_complex"]:
-            # For minimal security, use regex result
-            result = results.get("regex", {"is_secure": True, "method": "regex"})
+        if security_level == "minimal":
+            # For minimal security, only check critical patterns
+            critical_patterns = [
+                r'rm\s+-rf\s+/',  # System destruction
+                r'format\s+c:',   # Windows format
+                r'del\s+/s\s+/q', # Windows delete all
+            ]
+
+            for pattern in critical_patterns:
+                if re.search(pattern, text, re.IGNORECASE):
+                    result = {
+                        "is_secure": False,
+                        "method": "minimal_critical",
+                        "reason": "Critical system destruction pattern detected",
+                        "validation_metrics": metrics,
+                        "validation_flow": validation_flow
+                    }
+                    return result
+
+            # Allow everything else for minimal profile
+            result = {
+                "is_secure": True,
+                "method": "minimal_permissive",
+                "validation_metrics": metrics,
+                "validation_flow": validation_flow
+            }
             metrics["total_time"] = time.time() - start_time
             result["validation_metrics"] = metrics
-            result["validation_flow"] = validation_flow
             return result
 
         if "ml" in results and not results["ml"]["is_secure"]:

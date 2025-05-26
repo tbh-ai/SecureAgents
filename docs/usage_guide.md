@@ -192,9 +192,32 @@ print(f"Squad execution complete. Results saved to outputs/examples directory.")
 ```
 
 For more examples, check the `examples/` directory in the repository:
+- `examples/user_friendly/` - **NEW!** 5 simple, diverse AI agent examples (Researcher, Developer, Analyst, Strategist, Advisor)
 - `examples/basic/` - Simple examples demonstrating core functionality
 - `examples/advanced/` - More complex examples showcasing advanced features
 - `examples/security/` - Examples focused on security features
+
+### User-Friendly Examples
+
+The `examples/user_friendly/` directory contains 5 ready-to-run examples that demonstrate different types of AI agents:
+
+1. **AI Researcher** - Research any topic and save to markdown
+2. **AI Code Developer** - Write code with specific requirements
+3. **AI Business Analyst** - Analyze business problems and strategies
+4. **AI Marketing Strategist** - Create marketing campaigns and strategies
+5. **AI Financial Advisor** - Provide investment and financial advice
+
+Each example demonstrates:
+- Proper use of guardrails with template variables
+- Different file formats (.md, .py, .json, .html, .pdf)
+- Minimal security settings for easy learning
+- Clean, simple code without fancy output
+
+To run any example:
+```bash
+cd examples/user_friendly/
+python3 1_ai_researcher.py
+```
 
 ## Advanced Features
 
@@ -230,7 +253,6 @@ Available security profiles:
 | Profile | Value | Description | Use Case |
 |---------|-------|-------------|----------|
 | **Minimal** | `"minimal"` | Only critical security checks | Development and testing |
-| **Low** | `"low"` | Basic security checks | Non-sensitive applications |
 | **Standard** | `"standard"` | Balanced security (default) | General purpose applications |
 | **High** | `"high"` | Strict security validation | Sensitive applications |
 | **Maximum** | `"maximum"` | Most stringent security | Highly sensitive applications |
@@ -239,18 +261,46 @@ For more details on security profiles, see the [Security Profiles Guide](./secur
 
 ### Guardrails
 
-Guardrails provide a way to pass dynamic inputs to your Squad during deployment. These inputs can be used to guide the experts' responses, enforce constraints, and provide additional context without modifying your core operations.
+Guardrails provide a powerful way to pass dynamic inputs to your operations using template variables. These inputs can be used to guide the experts' responses, enforce constraints, and provide additional context without modifying your core operations.
+
+#### Template Variables in Expert Profiles
 
 ```python
-# Define guardrail inputs
+# Expert with template variables
+researcher = Expert(
+    specialty="AI Researcher specializing in {research_topic}",
+    objective="Research {research_topic} and provide {research_depth} information",
+    security_profile="minimal"
+)
+```
+
+#### Template Variables in Operation Instructions
+
+```python
+# Operation with template variables
+research_operation = Operation(
+    instructions="Research the latest developments in {research_topic}. Focus on {focus_areas}. Use a {tone} tone and provide {research_depth} analysis.",
+    output_format="A {research_depth} research report with clear sections and bullet points",
+    expert=researcher,
+    result_destination="outputs/research_report.md"
+)
+```
+
+#### Guardrails Dictionary
+
+```python
+# Define guardrail inputs that fill the template variables
 guardrails = {
-    "topic": "AI ethics",
-    "tone": "balanced",
-    "include_examples": True,
-    "max_length": 1000
+    "research_topic": "renewable energy technology",
+    "research_depth": "comprehensive",
+    "focus_areas": "innovations, market trends, future outlook",
+    "tone": "professional"
 }
 
-# Deploy with guardrails
+# Execute with guardrails (for individual operations)
+result = research_operation.execute(guardrails=guardrails)
+
+# Or deploy with guardrails (for squads)
 result = squad.deploy(guardrails=guardrails)
 ```
 

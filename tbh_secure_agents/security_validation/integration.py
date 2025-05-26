@@ -6,6 +6,7 @@ approach with the existing TBH Secure Agents framework.
 """
 
 import logging
+import re
 from typing import Dict, Any, Optional, Tuple, Union
 
 from .security_validator import SecurityValidator
@@ -49,6 +50,25 @@ def integrate_with_expert(expert_class: type) -> type:
         """
         logger.debug(f"Performing hybrid prompt security check for Expert '{self.specialty}', Profile '{self.security_profile.value}'")
 
+        # For minimal security profile, use extremely permissive validation
+        if hasattr(self, 'security_profile') and self.security_profile.value == "minimal":
+            logger.debug(f"Minimal security profile - using permissive validation for prompt of length {len(prompt)}")
+
+            # Only check for the most critical exploits (like system destruction commands)
+            critical_patterns = [
+                r'rm\s+-rf\s+/',  # System destruction
+                r'format\s+c:',   # Windows format
+                r'del\s+/s\s+/q', # Windows delete all
+            ]
+
+            for pattern in critical_patterns:
+                if re.search(pattern, prompt, re.IGNORECASE):
+                    logger.warning(f"Minimal security: Blocked critical system destruction pattern")
+                    return False
+
+            # Allow everything else for minimal profile
+            return True
+
         # For backward compatibility, use the original method for certain cases
         if not hasattr(self, 'use_hybrid_validation') or not self.use_hybrid_validation:
             return original_is_prompt_secure(self, prompt)
@@ -74,12 +94,6 @@ def integrate_with_expert(expert_class: type) -> type:
         # Log the result
         if not is_secure:
             logger.warning(f"⚠️ SECURITY WARNING: Prompt security check FAILED: {error_details.get('error_message', 'Unknown reason')}")
-
-            # For minimal security profile, log but don't block
-            if self.security_profile.value == "minimal":
-                logger.info("Allowing execution despite security warning due to minimal security profile")
-                return True
-
             return False
 
         logger.debug(f"Prompt security check PASSED for Expert '{self.specialty}'")

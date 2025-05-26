@@ -165,7 +165,7 @@ class LLMRecommendationGenerator:
 
         threats_text = "\n".join(threat_descriptions)
 
-        prompt = f"""You are a cybersecurity expert providing recommendations to fix security issues in code or commands.
+        prompt = f"""You are a cybersecurity expert specializing in the TBH Secure Agents framework. Provide framework-specific recommendations.
 
 INPUT TEXT:
 ```
@@ -175,13 +175,15 @@ INPUT TEXT:
 DETECTED SECURITY THREATS:
 {threats_text}
 
-Please provide a detailed recommendation on how to fix these security issues. Include:
-1. A clear explanation of why the input is insecure
-2. Specific code examples showing how to rewrite it securely
-3. Best practices to follow in similar situations
-4. Any additional security considerations
+Please provide your recommendation as bullet points only, focusing on TBH Secure Agents framework features:
+• Explain why the input is insecure in the context of TBH Secure Agents
+• Recommend specific TBH Secure Agents security profiles (minimal, low, standard, high, maximum)
+• Suggest TBH Secure Agents features like hybrid validation, result_destination, or custom profiles
+• Reference TBH Secure Agents documentation and best practices
+• Mention framework-specific security capabilities (ML validation, LLM validation, etc.)
 
-Your recommendation should be comprehensive yet concise, focusing on practical solutions that maintain the original functionality while eliminating security risks.
+Your response should be in bullet point format only. Do NOT include any code examples or headers.
+Focus on TBH Secure Agents framework-specific recommendations.
 """
 
         return prompt
@@ -197,41 +199,19 @@ Your recommendation should be comprehensive yet concise, focusing on practical s
             str: Generated recommendation
         """
         if self.llm is None:
-            # Return a more helpful message with specific recommendations
-            return """
-### Security Recommendation
-
-Use secure file operations instead of system commands. For example, use Python's built-in file operations instead of 'rm -rf /tmp/data/*'.
-
-#### Why This Is Important
-
-System commands like `rm -rf` can be dangerous as they:
-- Can delete files permanently without possibility of recovery
-- May have unintended consequences if wildcards are used incorrectly
-- Could potentially be exploited if user input is incorporated
-
-#### Secure Alternative
-
-```python
-import os
-import shutil
-
-# Instead of: rm -rf /tmp/data/*
-data_dir = '/tmp/data'
-for item in os.listdir(data_dir):
-    item_path = os.path.join(data_dir, item)
-    if os.path.isfile(item_path):
-        os.unlink(item_path)
-    elif os.path.isdir(item_path):
-        shutil.rmtree(item_path)
-```
-
-This approach gives you more control and is safer than using shell commands.
-"""
+            # Return framework-specific recommendations in bullet points
+            return """• Consider using TBH Secure Agents' minimal security profile for less restrictive validation
+• System commands detected - recommend using standard or higher security profile for better protection
+• TBH Secure Agents framework provides built-in security validation to prevent such operations
+• Enable hybrid validation mode in TBH Secure Agents for comprehensive security checking
+• Use TBH Secure Agents' result_destination feature to safely capture outputs
+• Consider implementing custom security profiles in TBH Secure Agents for your specific use case
+• TBH Secure Agents' ML and LLM validation layers can detect advanced security threats
+• Review TBH Secure Agents documentation for secure coding best practices"""
 
         try:
             # Create system prompt
-            system_prompt = "You are an elite cybersecurity expert providing recommendations to fix security issues."
+            system_prompt = "You are an elite cybersecurity expert specializing in the TBH Secure Agents framework. Always respond in bullet point format without code examples or headers. Focus on framework-specific recommendations."
 
             # Generate content using Google's Generative AI
             response = self.llm.generate_content(
