@@ -49,7 +49,7 @@ Developed by tbh.ai team.
 
 ## 🔥 Palo Alto Security Validation Results
 
-**[View Complete Security Report →](./Palo_Alto_Security_Validation/TBH_AI_Stakeholder_Security_Report_20250525_181029.html)**
+**[View Complete Security Report →](./validation_reports/tbh.ai%20SecureAgents%20-%20Palo%20Alto%20Networks%20Security%20Validation%20Results.pdf)**
 
 | Metric | Result | Status |
 |--------|--------|--------|
@@ -164,22 +164,6 @@ tbh.ai SecureAgents v0.4.1/
 ├── 🤖 security_models/                  # ML security models
 └── 📈 validation_visualizations/        # Performance metrics
 ```
-
-## 📚 Documentation
-
-**🔒 Security & Validation:**
-*   **[Palo Alto Security Report](./Palo_Alto_Security_Validation/README.md)** - Complete security validation
-*   **[Enhanced Adaptive Security Guide](./docs/adaptive_security.md)** - Next-generation adaptive learning
-*   **[Hybrid Security Validation](./docs/hybrid_security_validation.md)** - Multi-layer defense system
-*   **[Security Profiles Guide](./docs/security_profiles_guide.md)** - Security configuration
-*   **[Student Guide to Adaptive Security](./Enhanced_Adaptive_Security_Student_Guide.docx)** - Educational resource
-
-**🚀 Framework Usage:**
-*   **[Quick Start Guide](./SecureAgents/docs/quick_start.md)** - Get started quickly
-*   **[Usage Guide](./SecureAgents/docs/usage_guide.md)** - Comprehensive usage
-*   **[Installation Guide](./SecureAgents/docs/installation.md)** - Setup instructions
-*   **[Guardrails Guide](./SecureAgents/docs/guardrails_comprehensive.md)** - Security controls
-*   **[Result Destination Guide](./SecureAgents/docs/result_destination.md)** - Output handling
 
 ## 🚀 Quick Start (Security-First Example)
 
@@ -328,9 +312,9 @@ The Apache License 2.0 was chosen to provide a balance between open-source acces
 For enterprise deployments, custom security profiles, and professional support:
 
 **Contact**: tbh.ai Team
-**Email**: enterprise@tbh.ai
-**Website**: https://tbh.ai
-**Security Validation**: [View Palo Alto Report](./Palo_Alto_Security_Validation/)
+**Email**: saish.shinde.jb@gmail.com
+**Website**: https://tbhai.solutions
+**Security Validation**: [View Palo Alto Report](./validation_reports/)
 
 ---
 
