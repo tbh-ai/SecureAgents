@@ -33,7 +33,7 @@ def integrate_with_expert(expert_class: type) -> type:
     original_is_output_secure = expert_class._is_output_secure
 
     # Create a security validator
-    validator = SecurityValidator(interactive=False, enable_reports=True, enable_recommendations=True)
+    validator = SecurityValidator(interactive=False)
 
     # Define the new methods
     def new_is_prompt_secure(self, prompt: str, generate_report: bool = False, open_report: bool = False) -> bool:
@@ -48,10 +48,10 @@ def integrate_with_expert(expert_class: type) -> type:
         Returns:
             bool: True if the prompt passes all security checks, False otherwise
         """
-        logger.debug(f"Performing hybrid prompt security check for Expert '{self.specialty}', Profile '{self.security_profile.value}'")
+        logger.debug(f"Performing hybrid prompt security check for Expert '{self.specialty}', Profile '{self.security_profile}'")
 
         # For minimal security profile, use extremely permissive validation
-        if hasattr(self, 'security_profile') and self.security_profile.value == "minimal":
+        if hasattr(self, 'security_profile') and self.security_profile == "minimal":
             logger.debug(f"Minimal security profile - using permissive validation for prompt of length {len(prompt)}")
 
             # Only check for the most critical exploits (like system destruction commands)
@@ -86,9 +86,7 @@ def integrate_with_expert(expert_class: type) -> type:
         # Validate the prompt
         is_secure, error_details = validator.validate_prompt(
             prompt,
-            security_level=self.security_profile.value,
-            generate_report=should_generate_report,
-            open_report=should_open_report
+            security_level=self.security_profile
         )
 
         # Log the result
@@ -111,7 +109,7 @@ def integrate_with_expert(expert_class: type) -> type:
         Returns:
             bool: True if the output passes all security checks, False otherwise
         """
-        logger.debug(f"Performing hybrid output security check for Expert '{self.specialty}', Profile '{self.security_profile.value}'")
+        logger.debug(f"Performing hybrid output security check for Expert '{self.specialty}', Profile '{self.security_profile}'")
 
         # For backward compatibility, use the original method for certain cases
         if not hasattr(self, 'use_hybrid_validation') or not self.use_hybrid_validation:
@@ -130,9 +128,7 @@ def integrate_with_expert(expert_class: type) -> type:
         # Validate the output
         is_secure, error_details = validator.validate_output(
             output,
-            security_level=self.security_profile.value,
-            generate_report=should_generate_report,
-            open_report=should_open_report
+            security_level=self.security_profile
         )
 
         # Log the result
@@ -140,7 +136,7 @@ def integrate_with_expert(expert_class: type) -> type:
             logger.warning(f"⚠️ SECURITY WARNING: Output security check FAILED: {error_details.get('error_message', 'Unknown reason')}")
 
             # For minimal security profile, log but don't block
-            if self.security_profile.value == "minimal":
+            if self.security_profile == "minimal":
                 logger.info("Allowing output despite security warning due to minimal security profile")
                 return True
 
@@ -176,7 +172,7 @@ def integrate_with_squad(squad_class: type) -> type:
     original_validate_operation_security = squad_class._validate_operation_security
 
     # Create a security validator
-    validator = SecurityValidator(interactive=False, enable_reports=True, enable_recommendations=True)
+    validator = SecurityValidator(interactive=False)
 
     # Define the new method
     def new_validate_operation_security(self, operation: Any, index: int,
@@ -213,9 +209,7 @@ def integrate_with_squad(squad_class: type) -> type:
         # Validate the operation
         is_secure, error_details = validator.validate_operation(
             operation,
-            security_level=self.security_profile.value,
-            generate_report=should_generate_report,
-            open_report=should_open_report
+            security_level=self.security_profile
         )
 
         # Return the result

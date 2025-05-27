@@ -31,6 +31,12 @@ from .integration import (
     integrate_with_squad,
     enable_hybrid_validation
 )
+from .adaptive_security import (
+    get_next_gen_adaptive_validator,
+    get_next_gen_adaptive_engine,
+    NextGenAdaptiveValidator,
+    NextGenAdaptiveSecurityEngine
+)
 
 __all__ = [
     'SecurityValidator',
@@ -42,5 +48,9 @@ __all__ = [
     'SecurityUI',
     'integrate_with_expert',
     'integrate_with_squad',
-    'enable_hybrid_validation'
+    'enable_hybrid_validation',
+    'get_next_gen_adaptive_validator',
+    'get_next_gen_adaptive_engine',
+    'NextGenAdaptiveValidator',
+    'NextGenAdaptiveSecurityEngine'
 ]
