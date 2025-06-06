@@ -310,8 +310,6 @@ compliance_memories = compliance_expert.recall("healthcare regulations", limit=3
 print(f"Compliance expert recalled {len(compliance_memories)} relevant memories")
 ```
 
-
-
 ## Contributing
 
 Contributions are welcome! Please see the `CONTRIBUTING.md` file and follow these guidelines:
