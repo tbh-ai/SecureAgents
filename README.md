@@ -1,11 +1,11 @@
-# 🔒 tbh.ai SecureAgents v0.4.0
+# 🔒 tbh.ai SecureAgents v0.5.0
 
 <img width="618" alt="Main" src="./docs/Main.png" />
 
 [![Security Grade](https://img.shields.io/badge/Security%20Grade-A%2B-brightgreen)](./validation_reports/)
 [![Threat Protection](https://img.shields.io/badge/Threat%20Protection-95%25-green)](./validation_reports/)
 [![Palo Alto Validated](https://img.shields.io/badge/Palo%20Alto%20Unit%2042-Validated-blue)](./validation_reports/)
-[![Version](https://img.shields.io/badge/Version-0.4.0-orange)](https://github.com/tbh-ai/SecureAgents/releases/tag/v0.4.0)
+[![Version](https://img.shields.io/badge/Version-0.5.0-orange)](https://github.com/tbh-ai/SecureAgents/releases/tag/v0.5.0)
 
 **Enterprise-grade secure multi-agent framework with 95% threat protection validated against Palo Alto Networks Unit 42 attack scenarios.**
 
@@ -28,6 +28,7 @@ Developed by tbh.ai team.
 *   **Expert Agents** - Specialized AI agents with configurable security profiles
 *   **Squad Operations** - Orchestrate multiple agents with secure communication
 *   **User-Friendly Framework** - Simple creation of Expert agents and Squad operations
+*   **Memory Systems** - Advanced memory capabilities with automatic storage and retrieval
 *   **Dynamic Guardrails** - Runtime security controls and constraint enforcement
 *   **Result Destinations** - Secure output handling in multiple formats (TXT, MD, HTML, JSON, CSV, PDF)
 *   **Comprehensive Logging** - Full audit trails for compliance and monitoring
@@ -61,6 +62,83 @@ Developed by tbh.ai team.
 8. ✅ **BOLA Attack** - Authorization bypass prevention
 9. ⚠️ **Indirect Prompt Injection** - Partial protection (95% credibility)
 
+## 🧠 Advanced Memory System
+
+**tbh.ai SecureAgents** includes a sophisticated memory system that enables agents to retain and recall information across sessions, making them more intelligent and context-aware.
+
+### 🎯 **Memory Features**
+- **🔄 Automatic Memory** - Agents automatically store task context and results
+- **🎛️ Manual Control** - Store and retrieve specific information with `remember()` and `recall()`
+- **⚡ Multiple Durations** - Short-term, long-term, and auto-adaptive memory
+- **🔍 Vector Search** - Advanced semantic search using ChromaDB embeddings
+- **🔒 Secure Storage** - Encrypted memory with user isolation
+- **📊 Multiple Types** - Working, session, and long-term memory types
+
+### 📋 **Memory Duration Options**
+```python
+# Short-term memory (session-based, in-memory)
+expert = Expert(
+    specialty="Data Analyst",
+    memory_duration="short_term"  # or "session", "temporary", "temp"
+)
+
+# Long-term memory (persistent, ChromaDB with vector search)
+expert = Expert(
+    specialty="Research Specialist", 
+    memory_duration="long_term"   # or "persistent", "permanent"
+)
+
+# Auto-adaptive memory (intelligent duration selection)
+expert = Expert(
+    specialty="Content Writer",
+    memory_duration="auto"        # or "automatic", "smart", "adaptive"
+)
+
+# Disabled memory
+expert = Expert(
+    specialty="Simple Calculator",
+    memory_duration="disabled"    # or "none", "off", "disable"
+)
+```
+
+### 💾 **Manual Memory Operations**
+```python
+# Store information manually
+memory_id = expert.remember(
+    content="Important research findings about AI security",
+    memory_type="long_term"  # "working", "session", or "long_term"
+)
+
+# Retrieve information with semantic search
+memories = expert.recall(
+    query="AI security research",
+    limit=5,
+    memory_type="long_term"  # Optional filter
+)
+
+# Process retrieved memories
+for memory in memories:
+    print(f"Content: {memory['content']}")
+    print(f"Type: {memory['memory_type']}")
+    print(f"Created: {memory['created_at']}")
+```
+
+### 🔄 **Automatic Memory Integration**
+```python
+# Agents automatically store task context and results
+result = expert.execute_task(
+    task_description="Analyze market trends for AI security",
+    context="Focus on enterprise adoption rates"
+)
+# ✅ Task description, context, and result are automatically stored
+
+# Context is automatically retrieved for subsequent tasks
+result2 = expert.execute_task(
+    task_description="Provide recommendations based on the analysis"
+)
+# ✅ Previous analysis is automatically recalled and used as context
+```
+
 ## 📦 Installation
 
 ```bash
@@ -72,7 +150,7 @@ pip install tbh-secure-agents
 ## 📁 Project Structure
 
 ```
-tbh.ai SecureAgents v0.4.0/
+tbh.ai SecureAgents v0.5.0/
 ├── 📚 tbh_secure_agents/                 # Core framework code
 │   ├── security_validation/             # Security validation system
 │   ├── agent.py                         # Agent implementation
@@ -105,15 +183,15 @@ tbh.ai SecureAgents v0.4.0/
 *   **[Quick Start Guide](./docs/quick_start.md)** - Get started quickly
 *   **[Usage Guide](./docs/usage_guide.md)** - Comprehensive usage
 *   **[Installation Guide](./docs/installation.md)** - Setup instructions
-*   **[Memory Duration Guide](./SecureAgents/USER_GUIDE_MEMORY_DURATION.md)** - User-friendly memory options
+*   **[Memory Examples](./examples/memory_examples/)** - Advanced memory integration examples
 *   **[Guardrails Guide](./docs/guardrails_comprehensive.md)** - Security controls
 *   **[Result Destination Guide](./docs/result_destination.md)** - Output handling
 *   **[Best Practices](./docs/best_practices.md)** - Development best practices
 *   **[FAQ](./docs/faq.md)** - Frequently asked questions
 
-## 🚀 Quick Start (Security-First Example)
+## 🚀 Quick Start (Security-First Example with Memory)
 
-Here's a production-ready example showcasing enterprise security:
+Here's a production-ready example showcasing enterprise security and memory integration:
 
 ```python
 from tbh_secure_agents import Expert, Operation, Squad
@@ -122,34 +200,49 @@ import os
 # Create secure outputs directory
 os.makedirs("secure_outputs", exist_ok=True)
 
-# Define experts with enterprise security profiles
+# Define experts with enterprise security profiles and memory
 security_analyst = Expert(
     specialty="Cybersecurity Analyst",
     objective="Analyze security threats and provide protection recommendations",
     background="Expert in threat analysis with 95% attack prevention rate.",
-    security_profile="maximum"  # Enterprise-grade security
+    security_profile="maximum",  # Enterprise-grade security
+    memory_duration="long_term",  # Enable persistent memory
+    user_id="security_analyst_001"
 )
 
 compliance_expert = Expert(
-    specialty="Compliance Specialist",
+    specialty="Compliance Specialist", 
     objective="Ensure regulatory compliance and security standards",
     background="Specialized in enterprise security compliance and validation.",
-    security_profile="high"  # High security for sensitive operations
+    security_profile="high",  # High security for sensitive operations
+    memory_duration="long_term",  # Enable persistent memory
+    user_id="compliance_expert_001"
+)
+
+# Store important security context in memory
+security_analyst.remember(
+    content="Current threat landscape includes increased AI-targeted attacks",
+    memory_type="long_term"
+)
+
+compliance_expert.remember(
+    content="New healthcare AI regulations require enhanced data protection",
+    memory_type="long_term"
 )
 
 # Define operations with result destinations
 security_operation = Operation(
-    instructions="Analyze current cybersecurity threats in healthcare and provide protection recommendations.",
+    instructions="Analyze current cybersecurity threats in healthcare and provide protection recommendations. Use any relevant past analysis from memory.",
     output_format="A comprehensive security analysis with threat assessment and mitigation strategies.",
     expert=security_analyst,
-    result_destination="secure_outputs/security_analysis.md"  # Save result to a markdown file
+    result_destination="secure_outputs/security_analysis.md"
 )
 
 compliance_operation = Operation(
-    instructions="Review healthcare AI compliance requirements and provide a compliance checklist.",
+    instructions="Review healthcare AI compliance requirements and provide a compliance checklist. Reference any previous compliance work from memory.",
     output_format="A detailed compliance report with regulatory requirements and recommendations.",
     expert=compliance_expert,
-    result_destination="secure_outputs/compliance_report.txt"  # Save result to a text file
+    result_destination="secure_outputs/compliance_report.txt"
 )
 
 # Create a squad with template variables in operations
@@ -157,7 +250,8 @@ template_expert = Expert(
     specialty="Healthcare Specialist",
     objective="Provide {output_type} about healthcare technology",
     background="Expert in healthcare technology with a focus on {focus_area}.",
-    security_profile="minimal"  # Using minimal security for simplicity
+    security_profile="minimal",  # Using minimal security for simplicity
+    memory_duration="auto"  # Auto-adaptive memory
 )
 
 # Create an operation with template variables and conditional formatting
@@ -177,7 +271,7 @@ template_operation = Operation(
     }
     """,
     expert=template_expert,
-    result_destination="outputs/examples/healthcare_summary.html"  # Save result to an HTML file
+    result_destination="outputs/examples/healthcare_summary.html"
 )
 
 # Form a squad with result destination
@@ -187,7 +281,7 @@ security_squad = Squad(
     process="sequential",  # Operations run in sequence, passing results as context
     result_destination={
         "format": "json",
-        "file_path": "secure_outputs/security_squad_result.json"  # Save squad result to a JSON file
+        "file_path": "secure_outputs/security_squad_result.json"
     }
 )
 
@@ -204,8 +298,16 @@ guardrails = {
 # Deploy the squad with guardrails
 result = security_squad.deploy(guardrails=guardrails)
 
-print("Squad result:", result[:100] + "...")  # Print a preview of the result
+print("Squad result:", result[:100] + "...")
 print("Results saved to the secure_outputs directory")
+
+# Demonstrate memory recall
+print("\n🧠 Memory Recall Examples:")
+security_memories = security_analyst.recall("threat analysis", limit=3)
+print(f"Security analyst recalled {len(security_memories)} relevant memories")
+
+compliance_memories = compliance_expert.recall("healthcare regulations", limit=3) 
+print(f"Compliance expert recalled {len(compliance_memories)} relevant memories")
 ```
 
 
@@ -258,8 +360,8 @@ The Apache License 2.0 was chosen to provide a balance between open-source acces
 For enterprise deployments, custom security profiles, and professional support:
 
 **Contact**: tbh.ai Team
-**Email**: enterprise@tbh.ai
-**Website**: https://tbh.ai
+**Email**: saish.shinde.jb@gmail.com
+**Website**: www.tbhai.solutions
 **Security Validation**: [View Palo Alto Report](./validation_reports/)
 
 ---
