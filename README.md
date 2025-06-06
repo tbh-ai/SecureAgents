@@ -1,55 +1,46 @@
-# 🔒 tbh.ai SecureAgents v0.4.1
+# 🔒 tbh.ai SecureAgents v0.4.0
 
-<img width="618" alt="Main" src="https://github.com/user-attachments/assets/dbbf5a4f-7b0b-4f43-9b37-ef77dc761ff1" />
+<img width="618" alt="Main" src="./docs/Main.png" />
 
-[![Security Grade](https://img.shields.io/badge/Security%20Grade-A%2B-brightgreen)](./Palo_Alto_Security_Validation/)
-[![Threat Protection](https://img.shields.io/badge/Threat%20Protection-95%25-green)](./Palo_Alto_Security_Validation/)
-[![Palo Alto Validated](https://img.shields.io/badge/Palo%20Alto%20Unit%2042-Validated-blue)](./Palo_Alto_Security_Validation/)
-[![Version](https://img.shields.io/badge/Version-0.4.1-orange)](https://github.com/tbh-ai/SecureAgents/releases/tag/v0.4.1)
-[![Adaptive Learning](https://img.shields.io/badge/Adaptive%20Learning-Next%20Gen-purple)](./docs/adaptive_security.md)
-[![Hybrid Validation](https://img.shields.io/badge/Hybrid%20Validation-Active-blue)](./docs/hybrid_security_validation.md)
+[![Security Grade](https://img.shields.io/badge/Security%20Grade-A%2B-brightgreen)](./validation_reports/)
+[![Threat Protection](https://img.shields.io/badge/Threat%20Protection-95%25-green)](./validation_reports/)
+[![Palo Alto Validated](https://img.shields.io/badge/Palo%20Alto%20Unit%2042-Validated-blue)](./validation_reports/)
+[![Version](https://img.shields.io/badge/Version-0.4.0-orange)](https://github.com/tbh-ai/SecureAgents/releases/tag/v0.4.0)
 
-**Enterprise-grade secure multi-agent framework with next-generation adaptive learning and 95% threat protection validated against Palo Alto Networks Unit 42 attack scenarios.**
+**Enterprise-grade secure multi-agent framework with 95% threat protection validated against Palo Alto Networks Unit 42 attack scenarios.**
 
-tbh.ai SecureAgents is the world's most secure multi-agent AI framework, featuring revolutionary **Enhanced Adaptive Security** with real-time behavioral learning and hybrid validation. Built by tbh.ai, this framework enables developers to create, manage, and deploy teams of AI agents with military-grade security controls that learn and evolve.
+tbh.ai SecureAgents is the world's most secure multi-agent AI framework, providing enterprise-ready security validation against real-world threats. Built by tbh.ai, this framework enables developers to create, manage, and deploy teams of AI agents with military-grade security controls.
 
-🎯 **Key Differentiators**:
-- **🧠 Next-Generation Adaptive Learning**: Real-time behavioral analysis and pattern evolution
-- **🔄 Hybrid Security Validation**: Multi-layer defense (Regex + ML + LLM)
-- **🛡️ 95% Attack Prevention Rate**: Validated against Palo Alto Networks Unit 42 threats
-- **⚡ Sub-Millisecond Security**: Lightning-fast adaptive threat detection
+🎯 **Key Differentiator**: Only multi-agent framework validated against Palo Alto Networks Unit 42 threat intelligence with **95% attack prevention rate**.
 
 Developed by tbh.ai team.
 
 ## 🚀 Key Features
 
-### 🔒 **Next-Generation Adaptive Security (A+ Grade)**
-*   **🧠 Enhanced Adaptive Learning** - Real-time behavioral analysis and pattern evolution
-*   **🔄 Hybrid Security Validation** - Multi-layer defense (Regex + ML + LLM)
-*   **🎭 Individual User Modeling** - Personal behavioral baselines and anomaly detection
-*   **⚡ Sub-Millisecond Detection** - Lightning-fast adaptive threat response
-*   **🧬 Pattern Evolution** - Self-improving security patterns that learn from threats
-*   **🎯 Context-Aware Validation** - Smart decision making based on user behavior
-*   **95% Threat Protection** - Validated against Palo Alto Networks Unit 42 scenarios
+### 🔒 **Enterprise Security (A+ Grade)**
+*   **95% Threat Protection** - Validated against Palo Alto Networks Unit 42 attack scenarios
+*   **Hybrid Security Validation** - Combines regex, ML, and LLM-based threat detection
+*   **Real-Time Learning** - Adapts to new attack patterns automatically
+*   **Multi-Layer Defense** - Pre-execution and runtime security checkpoints
+*   **Zero-Day Protection** - Advanced pattern recognition for unknown threats
 
 ### 🎯 **Production-Ready Framework**
 *   **Expert Agents** - Specialized AI agents with configurable security profiles
 *   **Squad Operations** - Orchestrate multiple agents with secure communication
+*   **User-Friendly Framework** - Simple creation of Expert agents and Squad operations
 *   **Dynamic Guardrails** - Runtime security controls and constraint enforcement
 *   **Result Destinations** - Secure output handling in multiple formats (TXT, MD, HTML, JSON, CSV, PDF)
 *   **Comprehensive Logging** - Full audit trails for compliance and monitoring
 
-### 📊 **Enhanced Performance & Learning**
-*   **🎯 95% Attack Prevention** - 8/9 Palo Alto scenarios blocked
-*   **🧠 10+ Enhanced Patterns** - Multi-source threat intelligence (Palo Alto, MITRE ATT&CK)
-*   **⚡ Sub-1ms Validation** - Lightning-fast adaptive security responses
-*   **🎭 Real-Time Learning** - Behavioral profiles and pattern evolution
-*   **🔄 Hybrid Validation** - Multi-layer security without performance impact
-*   **📈 Production Tested** - User examples validated with enhanced security
+### 📊 **Validated Performance**
+*   **8/9 Attack Scenarios Blocked** - Comprehensive threat coverage
+*   **43 Threat Patterns Learned** - Continuous security improvement
+*   **5.90s Average Response Time** - High performance with security
+*   **Enterprise Scalability** - Production-tested architecture
 
 ## 🔥 Palo Alto Security Validation Results
 
-**[View Complete Security Report →](./Palo_Alto_Security_Validation/TBH_AI_Stakeholder_Security_Report_20250525_181029.html)**
+**[View Complete Security Report →](./validation_reports/TBH_AI_Stakeholder_Security_Report_20250525_181029.html)**
 
 | Metric | Result | Status |
 |--------|--------|--------|
@@ -70,66 +61,6 @@ Developed by tbh.ai team.
 8. ✅ **BOLA Attack** - Authorization bypass prevention
 9. ⚠️ **Indirect Prompt Injection** - Partial protection (95% credibility)
 
-## 🧠 Enhanced Adaptive Security Features
-
-### 🚀 **Next-Generation Adaptive Learning**
-Our revolutionary adaptive security system represents a quantum leap in AI protection technology:
-
-#### **🎭 Behavioral Analysis Engine**
-- **Individual User Modeling**: Creates personal behavioral baselines for each user
-- **Anomaly Detection**: Real-time detection of suspicious behavior patterns
-- **Risk Scoring**: Dynamic risk assessment based on user activity
-- **Context Awareness**: Understands user intent and environmental factors
-
-#### **🧬 Pattern Evolution System**
-- **Self-Improving Patterns**: Security patterns that get smarter with each threat
-- **Multi-Source Intelligence**: Integrates Palo Alto Unit 42, MITRE ATT&CK, and custom patterns
-- **Frequency Learning**: Patterns gain confidence through successful detections
-- **Temporal Decay**: Older patterns gradually lose relevance for accuracy
-
-#### **🔄 Hybrid Validation Architecture**
-- **Layer 1 - Regex**: Lightning-fast pattern matching (sub-millisecond)
-- **Layer 2 - Machine Learning**: Sophisticated threat classification
-- **Layer 3 - LLM Analysis**: Context-aware content understanding
-- **Smart Orchestration**: Optimal layer selection for performance and accuracy
-
-#### **⚡ Performance Excellence**
-- **Sub-Millisecond Response**: Faster than an eye blink (0.3ms average)
-- **Real-Time Learning**: Instant adaptation without batch processing
-- **Memory Efficient**: Smart pattern reuse vs. pattern explosion
-- **Production Ready**: Validated with user examples and real workloads
-
-### 🎯 **Adaptive Learning in Action**
-
-```python
-from tbh_secure_agents.security_validation import get_next_gen_adaptive_validator
-
-# Initialize the next-generation adaptive validator
-validator = get_next_gen_adaptive_validator()
-
-# The system learns from every validation
-result = validator.validate(
-    text="suspicious_code_here",
-    context={
-        "user_id": "developer_123",
-        "security_level": "standard",
-        "content_type": "python_code"
-    }
-)
-
-# Real-time insights
-print(f"Threat Detected: {not result['is_secure']}")
-print(f"Confidence: {result['confidence']:.3f}")
-print(f"Behavioral Anomaly: {result['behavioral_anomaly_score']:.3f}")
-print(f"Validation Time: {result['validation_time_ms']:.1f}ms")
-```
-
-**Key Benefits:**
-- 🧠 **Learns from every interaction** - No manual updates required
-- 🎭 **Personalizes security per user** - Reduces false positives
-- ⚡ **Maintains high performance** - Sub-millisecond responses
-- 🔄 **Adapts to new threats** - Zero-day protection through behavioral analysis
-
 ## 📦 Installation
 
 ```bash
@@ -141,45 +72,44 @@ pip install tbh-secure-agents
 ## 📁 Project Structure
 
 ```
-tbh.ai SecureAgents v0.4.1/
-├── 🔒 Palo_Alto_Security_Validation/     # Security validation results
-│   ├── TBH_AI_Stakeholder_Security_Report_20250525_181029.html (95% success)
-│   ├── generate_stakeholder_report.py
-│   └── README.md
-├── 📚 SecureAgents/                      # Main framework with enhanced adaptive security
-│   ├── tbh_secure_agents/               # Core framework code
-│   │   ├── security_validation/         # Enhanced adaptive security system
-│   │   │   ├── adaptive_security.py     # Next-gen adaptive learning engine
-│   │   │   ├── validators/              # Hybrid validation (Regex + ML + LLM)
-│   │   │   └── integration.py           # Framework integration
-│   │   ├── agent.py                     # Expert agents with security profiles
-│   │   ├── crew.py                      # Squad operations
-│   │   └── operation.py                 # Secure operations
-│   ├── docs/                            # Documentation
-│   ├── examples/                        # Usage examples (validated with enhanced security)
-│   │   └── user_friendly/               # Production-ready examples
-│   └── outputs/                         # Generated outputs
-├── 📊 enhanced_visualizations/           # Security test visualizations
-├── 🔬 framework_integration_results/     # Integration test results
-├── 🤖 security_models/                  # ML security models
-└── 📈 validation_visualizations/        # Performance metrics
+tbh.ai SecureAgents v0.4.0/
+├── 📚 tbh_secure_agents/                 # Core framework code
+│   ├── security_validation/             # Security validation system
+│   ├── agent.py                         # Agent implementation
+│   ├── expert.py                        # Expert agents
+│   ├── squad.py                         # Squad operations
+│   └── operation.py                     # Operation management
+├── 📖 docs/                             # Documentation
+│   ├── quick_start.md                   # Quick start guide
+│   ├── security_guide.md                # Security documentation
+│   ├── usage_guide.md                   # Usage instructions
+│   └── installation.md                  # Installation guide
+├── 🎯 examples/                         # Usage examples
+│   ├── user_friendly/                   # User-friendly examples
+│   ├── security_mechanisms/             # Security examples
+│   └── basic/                           # Basic examples
+├── 🧪 V0.4_Tests/                       # Test suite
+├── 🔒 validation_reports/               # Security validation results
+├── 📊 security_models/                  # ML security models
+└── 🛠️ scripts/                          # Build and deployment scripts
 ```
 
 ## 📚 Documentation
 
 **🔒 Security & Validation:**
-*   **[Palo Alto Security Report](./Palo_Alto_Security_Validation/README.md)** - Complete security validation
-*   **[Enhanced Adaptive Security Guide](./docs/adaptive_security.md)** - Next-generation adaptive learning
-*   **[Hybrid Security Validation](./docs/hybrid_security_validation.md)** - Multi-layer defense system
+*   **[Palo Alto Security Report](./validation_reports/README.md)** - Complete security validation
 *   **[Security Profiles Guide](./docs/security_profiles_guide.md)** - Security configuration
-*   **[Student Guide to Adaptive Security](./Enhanced_Adaptive_Security_Student_Guide.docx)** - Educational resource
+*   **[Hybrid Security Validation](./docs/hybrid_security_validation.md)** - Advanced security
 
 **🚀 Framework Usage:**
-*   **[Quick Start Guide](./SecureAgents/docs/quick_start.md)** - Get started quickly
-*   **[Usage Guide](./SecureAgents/docs/usage_guide.md)** - Comprehensive usage
-*   **[Installation Guide](./SecureAgents/docs/installation.md)** - Setup instructions
-*   **[Guardrails Guide](./SecureAgents/docs/guardrails_comprehensive.md)** - Security controls
-*   **[Result Destination Guide](./SecureAgents/docs/result_destination.md)** - Output handling
+*   **[Quick Start Guide](./docs/quick_start.md)** - Get started quickly
+*   **[Usage Guide](./docs/usage_guide.md)** - Comprehensive usage
+*   **[Installation Guide](./docs/installation.md)** - Setup instructions
+*   **[Memory Duration Guide](./SecureAgents/USER_GUIDE_MEMORY_DURATION.md)** - User-friendly memory options
+*   **[Guardrails Guide](./docs/guardrails_comprehensive.md)** - Security controls
+*   **[Result Destination Guide](./docs/result_destination.md)** - Output handling
+*   **[Best Practices](./docs/best_practices.md)** - Development best practices
+*   **[FAQ](./docs/faq.md)** - Frequently asked questions
 
 ## 🚀 Quick Start (Security-First Example)
 
@@ -208,18 +138,18 @@ compliance_expert = Expert(
 )
 
 # Define operations with result destinations
-content_operation = Operation(
-    instructions="Write a short blog post about the benefits of artificial intelligence in healthcare.",
-    output_format="A well-structured blog post with a title, introduction, main points, and conclusion.",
-    expert=content_writer,
-    result_destination="outputs/examples/healthcare_ai_blog.md"  # Save result to a markdown file
+security_operation = Operation(
+    instructions="Analyze current cybersecurity threats in healthcare and provide protection recommendations.",
+    output_format="A comprehensive security analysis with threat assessment and mitigation strategies.",
+    expert=security_analyst,
+    result_destination="secure_outputs/security_analysis.md"  # Save result to a markdown file
 )
 
-analysis_operation = Operation(
-    instructions="Analyze the following data and provide insights: Patient wait times decreased by 30% after implementing AI scheduling. Diagnostic accuracy improved by 15%. Treatment planning time reduced by 25%.",
-    output_format="A concise analysis with key insights and recommendations.",
-    expert=data_analyst,
-    result_destination="outputs/examples/healthcare_data_analysis.txt"  # Save result to a text file
+compliance_operation = Operation(
+    instructions="Review healthcare AI compliance requirements and provide a compliance checklist.",
+    output_format="A detailed compliance report with regulatory requirements and recommendations.",
+    expert=compliance_expert,
+    result_destination="secure_outputs/compliance_report.txt"  # Save result to a text file
 )
 
 # Create a squad with template variables in operations
@@ -251,13 +181,13 @@ template_operation = Operation(
 )
 
 # Form a squad with result destination
-healthcare_squad = Squad(
-    experts=[content_writer, data_analyst, template_expert],
-    operations=[content_operation, analysis_operation, template_operation],
+security_squad = Squad(
+    experts=[security_analyst, compliance_expert, template_expert],
+    operations=[security_operation, compliance_operation, template_operation],
     process="sequential",  # Operations run in sequence, passing results as context
     result_destination={
         "format": "json",
-        "file_path": "outputs/examples/healthcare_squad_result.json"  # Save squad result to a JSON file
+        "file_path": "secure_outputs/security_squad_result.json"  # Save squad result to a JSON file
     }
 )
 
@@ -272,11 +202,13 @@ guardrails = {
 }
 
 # Deploy the squad with guardrails
-result = healthcare_squad.deploy(guardrails=guardrails)
+result = security_squad.deploy(guardrails=guardrails)
 
 print("Squad result:", result[:100] + "...")  # Print a preview of the result
-print("Results saved to the outputs/examples directory")
+print("Results saved to the secure_outputs directory")
 ```
+
+
 
 ## Contributing
 
@@ -315,13 +247,11 @@ The Apache License 2.0 was chosen to provide a balance between open-source acces
 
 ### 🎯 **Why Choose tbh.ai SecureAgents?**
 
-- **🧠 Next-Generation Security**: Revolutionary adaptive learning with behavioral analysis
-- **🔄 Hybrid Validation**: Multi-layer defense (Regex + ML + LLM) in one system
-- **⚡ Lightning Performance**: Sub-millisecond security responses (0.3ms average)
-- **🎭 Personalized Protection**: Individual user modeling and anomaly detection
-- **🔒 Palo Alto Validated**: 95% threat protection against Unit 42 scenarios
-- **📊 Production Proven**: Validated with real user examples and workloads
-- **🧬 Self-Improving**: Security patterns that evolve and get smarter over time
+- **🔒 Security First**: Only framework validated against Palo Alto Networks Unit 42 threats
+- **📊 Proven Results**: 95% threat protection rate in real-world scenarios
+- **🚀 Enterprise Ready**: Production-tested with comprehensive security controls
+- **🛡️ Continuous Protection**: Real-time learning and adaptive security
+- **📈 Performance**: High security without compromising speed (5.90s avg response)
 
 ### 🤝 **Enterprise Support**
 
@@ -330,7 +260,7 @@ For enterprise deployments, custom security profiles, and professional support:
 **Contact**: tbh.ai Team
 **Email**: enterprise@tbh.ai
 **Website**: https://tbh.ai
-**Security Validation**: [View Palo Alto Report](./Palo_Alto_Security_Validation/)
+**Security Validation**: [View Palo Alto Report](./validation_reports/)
 
 ---
 

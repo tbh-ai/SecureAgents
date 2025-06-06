@@ -18,7 +18,7 @@ import os
 # Set your Google API key (replace with your actual key)
 os.environ["GOOGLE_API_KEY"] = "your_google_api_key_here"
 
-from tbh_secure_agents import Expert, Operation
+from tbh_secure_agents import Expert, Operation, Squad
 
 def main():
     # Create outputs directory

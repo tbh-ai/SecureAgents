@@ -8,7 +8,7 @@ import os
 from tbh_secure_agents import Expert, Squad, Operation
 
 # Set API key
-os.environ["GOOGLE_API_KEY"] = "AIzaSyA3ZxbIXpR3yNkZwGDznrztdQmgnU16DJI"
+# os.environ["GOOGLE_API_KEY"] = "your-api-key-here"
 
 def main():
     # Create outputs directory

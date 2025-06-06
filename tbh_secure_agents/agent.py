@@ -52,12 +52,14 @@ class Expert:
         tools (List[Any], optional): A list of tools available to the expert.
         security_profile (str, optional): Defines the security constraints and capabilities. Defaults to 'standard'.
         api_key (str, optional): API key for Google Generative AI.
+        memory_duration (str, optional): Memory duration setting: "short_term", "long_term", "auto", "disabled". Defaults to "auto".
+        user_id (str, optional): User ID for memory management. Auto-generated if not provided.
         enable_visualization (bool, optional): Enable automatic visualization and reporting. Defaults to False.
-        auto_generate_reports (bool, optional): Automatically generate HTML reports for each task. Defaults to False.
-        visualization_output_dir (str, optional): Directory for saving visualization reports. Defaults to 'expert_reports'.
+        auto_generate_reports (bool, optional): Automatically generate HTML reports for each task. Defaults to False.        visualization_output_dir (str, optional): Directory for saving visualization reports. Defaults to 'expert_reports'.
         use_llm_recommendations (bool, optional): Use LLM for generating security recommendations. Defaults to True.
         auto_open_reports (bool, optional): Automatically open generated reports in browser. Defaults to False.
     """
+    
     def __init__(self,
                  specialty: str,
                  objective: str,
@@ -66,6 +68,10 @@ class Expert:
                  tools: Optional[List[Any]] = None,
                  security_profile: str = 'standard',
                  api_key: Optional[str] = None, # Add api_key parameter
+                 # Memory parameters
+                 memory_duration: str = "auto",  # Memory duration: "short_term", "long_term", "auto", "disabled"
+                 memory_enabled: Optional[bool] = None,  # Backward compatibility parameter
+                 user_id: Optional[str] = None,  # User ID for memory management
                  # Visualization hyperparameters
                  enable_visualization: bool = False,
                  auto_generate_reports: bool = False,
@@ -78,7 +84,40 @@ class Expert:
         self.llm_model_name = llm_model_name
         self.tools = tools or []
         self.security_profile_str = security_profile
-        self.llm: Optional[genai.GenerativeModel] = None
+        self.llm: Optional[genai.GenerativeModel] = None        # Set user ID for memory management
+        self.user_id = user_id or f"user_{hashlib.md5(specialty.encode()).hexdigest()[:8]}"
+
+        # Handle backward compatibility for memory_enabled parameter
+        if memory_enabled is not None:
+            if memory_enabled is False:
+                # memory_enabled=False overrides any memory_duration setting
+                memory_duration = "disabled"
+            elif memory_enabled is True and memory_duration == "auto":
+                # memory_enabled=True with default duration stays as auto
+                pass
+        
+        # Initialize memory duration and validate
+        self.memory_duration = self._validate_memory_duration(memory_duration)
+        self.memory_enabled = self.memory_duration != "disabled"
+        
+        # Initialize memory manager based on memory duration
+        self.memory_manager = None
+        if self.memory_enabled:
+            try:
+                memory_config = self._create_memory_config_with_duration(self.memory_duration)                # Import memory manager here to avoid circular imports
+                from .memory.memory_manager import MemoryManager
+                from .memory.config import MemorySystemConfig
+                  # Create memory system configuration
+                config = MemorySystemConfig.from_dict(memory_config)
+                
+                self.memory_manager = MemoryManager(config)
+                self.memory_manager.sync_initialize()
+                logger.info(f"Memory manager initialized with {self.memory_duration} configuration")
+                
+            except Exception as e:
+                logger.warning(f"Failed to initialize memory manager: {e}. Memory disabled.")
+                self.memory_enabled = False
+                self.memory_manager = None
 
         # Initialize visualization parameters
         self.enable_visualization = enable_visualization
@@ -390,9 +429,8 @@ class Expert:
                     return f"Error: Expert '{self.specialty}' failed to execute operation after {attempts} attempts due to LLM error: {e}"
                 # Optional: Add delay before retry
                 # import time
-                # time.sleep(1)
-                # Continue to the next iteration (retry)
-
+                # time.sleep(1)                # Continue to the next iteration (retry)
+        
         # Complete the operation with success
         if llm_output is not None:
             # Complete the reliability monitoring
@@ -401,6 +439,46 @@ class Expert:
                 output=llm_output[:100] + "..." if len(llm_output) > 100 else llm_output,
                 metadata={"success": True, "attempts": attempts}
             )
+            
+            # AUTOMATIC MEMORY STORAGE - Store task and result without user intervention
+            if self.memory_enabled and self.memory_manager:
+                try:
+                    from .memory.models import MemoryType
+                    
+                    # Determine memory type based on memory_duration setting
+                    if self.memory_duration == "short_term":
+                        auto_memory_type = MemoryType.SESSION
+                    elif self.memory_duration == "long_term":
+                        auto_memory_type = MemoryType.LONG_TERM
+                    else:  # auto or default
+                        auto_memory_type = MemoryType.WORKING
+                    
+                    # Store the task description as context (as vector embeddings in Chroma)
+                    task_memory = f"Task: {task_description}"
+                    if context:
+                        task_memory += f" (Context: {context[:100]}...)" if len(context) > 100 else f" (Context: {context})"
+                    
+                    self.memory_manager.sync_store(
+                        user_id=self.user_id,
+                        content=task_memory,
+                        memory_type=auto_memory_type,
+                        tags=["task", "input", "auto_stored"]
+                    )
+                    
+                    # Store the result/output (as vector embeddings in Chroma)
+                    result_memory = f"Result: {llm_output}"
+                    self.memory_manager.sync_store(
+                        user_id=self.user_id,
+                        content=result_memory,
+                        memory_type=auto_memory_type, 
+                        tags=["result", "output", "auto_stored"]
+                    )
+                    
+                    logger.debug(f"Auto-stored task and result as {auto_memory_type} embeddings for expert '{self.specialty}'")
+                    
+                except Exception as e:
+                    logger.warning(f"Failed to auto-store memories for expert '{self.specialty}': {e}")
+                    # Don't fail the whole operation if memory storage fails
 
             return llm_output
         else:
@@ -897,16 +975,14 @@ class Expert:
                 self.security_profile_str,
                 task_description,
                 "html"
-            )
-
-            # Auto-open if enabled
+            )            # Auto-open if enabled
             if self.auto_open_reports and report_path:
                 try:
                     import webbrowser
                     webbrowser.open(f"file://{os.path.abspath(report_path)}")
                 except Exception as e:
                     logger.warning(f"Could not auto-open report: {e}")
-
+            
             return report_path
 
         except Exception as e:
@@ -977,3 +1053,268 @@ class Expert:
                 return self._original_is_output_secure(output)
         else:
             return self._original_is_output_secure(output)
+
+    def _validate_memory_duration(self, memory_duration: str) -> str:
+        """
+        Validate and normalize memory duration parameter.
+        
+        Args:
+            memory_duration: Memory duration option
+            
+        Returns:
+            Validated memory duration string
+        """        # Define valid options and aliases
+        valid_options = ["short_term", "long_term", "auto", "disabled"]
+        aliases = {
+            "session": "short_term",
+            "temporary": "short_term", 
+            "temp": "short_term",
+            "persistent": "long_term",
+            "permanent": "long_term",
+            "extended": "long_term",  # Added for validation
+            "automatic": "auto",
+            "smart": "auto",
+            "adaptive": "auto",
+            "default": "auto",  # Added for validation
+            "disable": "disabled",
+            "none": "disabled",
+            "off": "disabled",
+            "false": "disabled"  # Added for validation
+        }
+        
+        # Handle invalid types gracefully
+        if not isinstance(memory_duration, str):
+            logger.error(f"Invalid memory_duration type '{type(memory_duration)}'. Defaulting to 'auto'.")
+            return "auto"
+
+        # Convert to lowercase for case-insensitive comparison
+        duration = memory_duration.lower().strip() if memory_duration else "auto"
+
+        # Check if it's a valid option
+        if duration in valid_options:
+            return duration
+
+        # Check if it's an alias
+        if duration in aliases:
+            return aliases[duration]
+            
+        # Invalid option - log warning and default to auto
+        logger.error(f"Invalid memory_duration '{memory_duration}'. Defaulting to 'auto'. Valid options: {valid_options} and aliases: {list(aliases.keys())}")
+        return "auto"
+
+    def _create_memory_config_with_duration(self, memory_duration: str) -> Dict[str, Any]:
+        """
+        Create memory configuration based on memory duration.
+        
+        Args:
+            memory_duration: Validated memory duration option
+            
+        Returns:
+            Configuration dictionary for memory system
+        """
+        from .memory.models import MemoryType
+        
+        configs = {
+            "short_term": {
+                "storage": {
+                    "backend": "memory",
+                    "sqlite_path": None
+                },
+                "memory_type_default": "SESSION",  # Updated to match expected value
+                "limits": {
+                    "max_entries_per_user": 200,
+                    "max_entry_size_bytes": 10000
+                },
+                "security": {
+                    "enable_encryption": False
+                },
+                "performance": {
+                    "cache_size": 50
+                }
+            },            "long_term": {
+                "storage": {
+                    "backend": "chroma",
+                    "chroma_collection": f"memory_{getattr(self, 'user_id', 'default')}_longterm",
+                    "chroma_persist_directory": f"./chroma_db_{getattr(self, 'user_id', 'default')}"
+                },
+                "memory_type_default": "LONG_TERM",  # Updated to match expected value
+                "limits": {
+                    "max_entries_per_user": 2000,
+                    "max_entry_size_bytes": 10000
+                },
+                "security": {
+                    "enable_encryption": True
+                },
+                "performance": {
+                    "cache_size": 100
+                }
+            },
+            "auto": {
+                "storage": {
+                    "backend": "chroma",
+                    "chroma_collection": f"memory_{getattr(self, 'user_id', 'default')}_auto",
+                    "chroma_persist_directory": f"./chroma_db_{getattr(self, 'user_id', 'default')}"
+                },
+                "memory_type_default": "WORKING",  # Updated to match expected value
+                "limits": {
+                    "max_entries_per_user": 1000,
+                    "max_entry_size_bytes": 10000
+                },
+                "security": {
+                    "enable_encryption": True
+                },
+                "performance": {
+                    "cache_size": 75
+                }
+            },
+            "disabled": {
+                "storage": {
+                    "backend": None,
+                    "sqlite_path": None
+                },
+                "memory_type_default": None,
+                "limits": {
+                    "max_entries_per_user": 0,
+                    "max_entry_size_bytes": 0
+                },
+                "security": {
+                    "enable_encryption": False
+                },
+                "performance": {
+                    "cache_size": 0
+                }
+            }
+        }
+        
+        config = configs.get(memory_duration, configs["auto"])
+        
+        # Ensure memory_type_default matches expected values
+        if memory_duration == "short_term":
+            config["memory_type_default"] = "SESSION"
+        elif memory_duration == "long_term":
+            config["memory_type_default"] = "LONG_TERM"
+        elif memory_duration == "auto":
+            config["memory_type_default"] = "WORKING"
+
+        # Add common configuration elements if memory is enabled
+        if memory_duration != "disabled":
+            config.update({
+                "user_id": getattr(self, 'user_id', 'default_user'),
+                "security_profile": getattr(self, 'security_profile', 'standard'),
+                "enable_search": True
+            })
+        
+        return config
+
+    def remember(self, content: str, memory_type: Optional[str] = None, priority: Optional[str] = None, metadata: Optional[Dict[str, Any]] = None) -> str:
+        """
+        Store information in expert's memory.
+        
+        Args:
+            content: The content to remember
+            memory_type: Type of memory (MemoryType or string)
+            priority: Memory priority (MemoryPriority or string)
+            metadata: Additional metadata for the memory
+            
+        Returns:
+            Memory ID if successful, error message if failed
+        """
+        if not self.memory_enabled or not self.memory_manager:
+            return "memory_disabled"
+        
+        try:
+            from .memory.models import MemoryType, MemoryPriority
+            
+            # Handle memory_type parameter
+            if memory_type is None:
+                mem_type = MemoryType.WORKING
+            elif isinstance(memory_type, str):
+                # Convert string to MemoryType enum
+                try:
+                    mem_type = getattr(MemoryType, memory_type.upper())
+                except AttributeError:
+                    mem_type = MemoryType.WORKING
+            else:
+                mem_type = memory_type
+            
+            # Handle priority parameter
+            if priority is None:
+                mem_priority = MemoryPriority.NORMAL
+            elif isinstance(priority, str):
+                # Convert string to MemoryPriority enum
+                try:
+                    mem_priority = getattr(MemoryPriority, priority.upper())
+                except AttributeError:
+                    mem_priority = MemoryPriority.NORMAL
+            else:
+                mem_priority = priority
+              # Store the memory
+            memory_id = self.memory_manager.sync_store(
+                user_id=self.user_id,
+                content=content,
+                memory_type=mem_type,
+                priority=mem_priority,
+                tags=list(metadata.keys()) if metadata else None
+            )
+            
+            return str(memory_id) if memory_id else "error_storing_memory"
+            
+        except Exception as e:
+            logger.error(f"Error in remember method: {e}")
+            return f"error_{str(e)[:50]}"
+    
+    def recall(self, query: str, limit: int = 10, memory_type: Optional[str] = None) -> List[Dict[str, Any]]:
+        """
+        Retrieve memories based on a query.
+        
+        Args:
+            query: Search query for memories
+            limit: Maximum number of memories to return
+            memory_type: Filter by memory type (optional)
+            
+        Returns:
+            List of memory dictionaries
+        """
+        if not self.memory_enabled or not self.memory_manager:
+            return []
+        
+        try:
+            from .memory.models import MemoryType
+            
+            # Handle memory_type filter
+            mem_type_filter = None
+            if memory_type:
+                if isinstance(memory_type, str):
+                    try:
+                        mem_type_filter = getattr(MemoryType, memory_type.upper())
+                    except AttributeError:
+                        mem_type_filter = None
+                else:
+                    mem_type_filter = memory_type
+              # Search memories
+            memories = self.memory_manager.sync_retrieve(
+                user_id=self.user_id,
+                query=query,
+                memory_types=[mem_type_filter] if mem_type_filter else None,
+                limit=limit
+            )
+            
+            # Convert memory objects to dictionaries
+            result = []
+            for memory in memories:
+                memory_dict = {
+                    'id': getattr(memory, 'id', 'unknown'),
+                    'content': getattr(memory, 'content', ''),
+                    'memory_type': getattr(memory, 'memory_type', None),
+                    'priority': getattr(memory, 'priority', None),
+                    'metadata': getattr(memory, 'metadata', {}),
+                    'created_at': getattr(memory, 'created_at', None),
+                    'tags': getattr(memory, 'tags', [])
+                }
+                result.append(memory_dict)
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error in recall method: {e}")
+            return []

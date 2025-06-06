@@ -97,7 +97,7 @@ The `result_destination` dictionary for squads has the following keys:
   - `html`: HTML format
   - `json`: JSON format
   - `csv`: CSV format
-  - `pdf`: PDF format (requires the `reportlab` package)
+  - `pdf`: PDF format 
 - `file_path`: The path where the file should be saved
 
 ## Output Format Details

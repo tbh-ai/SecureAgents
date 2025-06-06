@@ -3,7 +3,7 @@
 
 import logging
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 # Import logging configuration
 from .logging_config import configure_logging
@@ -19,6 +19,11 @@ from .squad import Squad
 # Expose security validation components (lean and mean)
 from .security_validation import SecurityValidator
 
+# Expose memory system components (NEW v5.0)
+from .memory.memory_manager import MemoryManager
+from .memory.models import MemoryEntry, MemoryType, MemoryPriority, MemoryAccess
+from .memory.config import MemorySystemConfig, StorageConfig, SecurityConfig
+
 # Expose terminal UI for direct use in applications
 from .logging_config import get_terminal
 
@@ -27,6 +32,12 @@ __all__ = [
     'Operation',
     'Squad',
     'SecurityValidator',
+    'MemoryManager',
+    'MemorySystemConfig',
+    'MemoryEntry',
+    'MemoryType',
+    'MemoryPriority',
+    'MemoryAccess',
     '__version__',
     'get_terminal'
 ]
