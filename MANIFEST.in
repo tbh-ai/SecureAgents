@@ -1,9 +1,29 @@
 include LICENSE
 include README.md
 include MANIFEST.in
+include pyproject.toml
+
+# Include documentation
 recursive-include docs *.md
+
+# Include example files
 recursive-include examples *.py *.md *.txt *.json *.html *.ipynb
-recursive-exclude examples/output *
+
+# Include ML model files
+recursive-include tbh_secure_agents/security_validation/models *.pkl
+recursive-include tbh_secure_agents/security_validation/models *.json
+
+# Exclude cache and build artifacts
 global-exclude __pycache__/*
 global-exclude *.py[cod]
 global-exclude *$py.class
+recursive-exclude examples/output *
+recursive-exclude *__pycache__ *
+recursive-exclude *.egg-info *
+recursive-exclude .pytest_cache *
+recursive-exclude .squad_knowledge *
+recursive-exclude .squad_knowledge_scale_test *
+recursive-exclude .test_expert_knowledge_runtime *
+recursive-exclude venv *
+recursive-exclude dist *
+recursive-exclude build *
