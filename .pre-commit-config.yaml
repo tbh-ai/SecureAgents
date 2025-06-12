@@ -1,0 +1,42 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: check-added-large-files  # Prevent giant files
+    -   id: check-ast                # Check that files parse as valid Python
+    -   id: check-merge-conflict     # Check for files with merge conflicts
+    -   id: debug-statements        # Check for debugger imports and breakpoints
+    -   id: detect-private-key       # Detect the presence of private keys
+    -   id: end-of-file-fixer       # Ensure files end with a newline
+    -   id: mixed-line-ending       # Replaces or checks mixed line ending
+    -   id: trailing-whitespace     # Trims trailing whitespace
+
+-   repo: https://github.com/awslabs/git-secrets
+    rev: 2.0.1
+    hooks:
+    -   id: git-secrets
+        additional_dependencies: [git-secrets]
+
+-   repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+    -   id: black
+        language_version: python3
+
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.275
+    hooks:
+    -   id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+-   repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.13
+    hooks:
+    -   id: validate-pyproject
+        name: Validate pyproject.toml
+        description: Validates pyproject.toml against PEP 517, 518 and 621.
+        entry: validate-pyproject
+        language: python
+        types: [toml]
+        additional_dependencies: [validate-pyproject[all]>=0.10,<1.0]
+        stages: [commit-msg, manual]

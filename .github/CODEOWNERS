@@ -1,0 +1,14 @@
+# Default owners for everything in the repo
+* @tbh-ai/security-team @tbh-ai/core-maintainers
+
+# Security validation components
+/security_validation/ @tbh-ai/security-team
+
+# Core framework components
+/tbh_secure_agents/ @tbh-ai/core-maintainers
+
+# Documentation
+/docs/ @tbh-ai/tech-writers
+
+# Examples
+/examples/ @tbh-ai/example-maintainers
